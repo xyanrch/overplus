@@ -64,7 +64,4 @@ private:
     bool vprotocol = false;
 
 
-
-    // boost::asio::steady_timer ssl_shutdown_timer;
-    // unsigned char temp[4096] {};
 };

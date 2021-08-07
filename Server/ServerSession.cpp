@@ -22,7 +22,6 @@
 #include <cstring>
 #include <string>
 
-constexpr static int SSL_SHUTDOWN_TIMEOUT = 30;
 std::atomic<uint32_t> ServerSession::connection_num(0);
 ServerSession::ServerSession(boost::asio::io_context& ioctx, boost::asio::ssl::context& sslctx)
 
@@ -32,7 +31,6 @@ ServerSession::ServerSession(boost::asio::io_context& ioctx, boost::asio::ssl::c
     , resolver_(ioctx)
     , in_buf(MAX_BUFF_SIZE)
     , out_buf(MAX_BUFF_SIZE)
-// , ssl_shutdown_timer(ioctx)
 
 {
     connection_num++;
