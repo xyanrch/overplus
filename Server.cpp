@@ -21,9 +21,13 @@ Server::Server(const std::string& address, const std::string& port)
 }
 void Server::do_accept()
 {
-    new_session.reset(new Session(context_pool.get_io_context()));
-    acceptor_.async_accept(new_session->socket(), [this](auto ec) {
+    std::shared_ptr<Session> new_session = std::make_shared<Session>(context_pool.get_io_context());
+    acceptor_.async_accept(new_session->socket(), [this, new_session](auto ec) {
         if (!acceptor_.is_open()) {
+            return;
+        }
+        if (ec == boost::asio::error::operation_aborted) {
+            NOTICE_LOG << "got cancel signal, stop calling myself";
             return;
         }
         if (!ec) {
@@ -38,7 +42,7 @@ void Server::do_accept()
 void Server::run()
 {
     NOTICE_LOG << "Server start..." << std::endl;
-    io_context.run();
+    context_pool.run();
 }
 void Server::add_signals()
 {

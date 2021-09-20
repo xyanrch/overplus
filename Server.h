@@ -1,12 +1,12 @@
 #ifndef SERVER_H_
 #define SERVER_H_
 #include "IoContextPool.h"
+#include "Log.h"
 #include "Session.h"
 #include <boost/asio.hpp>
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/signal_set.hpp>
 #include <memory>
-#include"Log.h"
 using namespace boost::asio;
 
 class Server : private boost::noncopyable {
@@ -25,6 +25,5 @@ private:
 
     boost::asio::signal_set signals;
     boost::asio::ip::tcp::acceptor acceptor_;
-    std::shared_ptr<Session> new_session;
 };
 #endif

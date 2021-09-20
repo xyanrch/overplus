@@ -4,9 +4,10 @@
 #include <boost/asio/io_context.hpp>
 #include <cstddef>
 Session::Session(boost::asio::io_context& context)
-    : in_socket(context)
-    , out_socket(context)
-    , resolver_(context)
+    : context_(context)
+    , in_socket(context_)
+    , out_socket(context_)
+    , resolver_(context_)
     , in_buf(MAX_BUFF_SIZE)
     , out_buf(MAX_BUFF_SIZE)
 {
@@ -34,7 +35,7 @@ void Session::do_read()
 void Session::sock5_handshake()
 {
     auto self(shared_from_this());
-    in_socket.async_receive(boost::asio::buffer(in_buf), [self, this](auto ec, auto len) {
+    in_socket.async_read_some(boost::asio::buffer(in_buf), [self, this](auto ec, auto len) {
         if (!ec) {
             if (len < 3 || in_buf[0] != 0x05) {
                 ERROR_LOG << "SOCKS5 handshake request is invalid. Closing session";
@@ -54,6 +55,7 @@ void Session::sock5_handshake()
 
         } else {
             ERROR_LOG << "sock5 handshake error：" << ec.message();
+            destroy();
         }
     });
 }
@@ -67,15 +69,17 @@ void Session::write_sock5_hanshake_reply()
                 if (in_buf[1] == (char)0xFF)
                     return; // No appropriate auth method found. Close session.
                 read_socks5_request();
-            } else
+            } else {
                 ERROR_LOG << "SOCKS5 handshake response write :" << ec.message();
+                destroy();
+            }
         });
 }
 void Session::read_socks5_request()
 {
     auto self(shared_from_this());
 
-    in_socket.async_receive(boost::asio::buffer(in_buf),
+    in_socket.async_read_some(boost::asio::buffer(in_buf),
         [this, self](boost::system::error_code ec, std::size_t length) {
             if (!ec) {
                 /*
@@ -134,8 +138,11 @@ appropriate for the request type.
                 }
 
                 do_resolve();
-            } else
+            } else {
                 ERROR_LOG << "SOCKS5 request read:" << ec.message();
+                destroy();
+            }
+            // ERROR_LOG << "SOCKS5 request read:" << ec.message();
         });
 }
 void Session::do_resolve()
@@ -148,6 +155,7 @@ void Session::do_resolve()
                 do_connect(it);
             } else {
                 ERROR_LOG << "failed to resolve " << remote_host << ":" << remote_port << " " << ec.message();
+                destroy();
             }
         });
 }
@@ -161,6 +169,7 @@ void Session::do_connect(tcp::resolver::iterator& it)
                 write_socks5_response();
             } else {
                 ERROR_LOG << "failed to connect " << remote_host << ":" << remote_port << " " << ec.message();
+                destroy();
             }
         });
 }
@@ -226,7 +235,7 @@ void Session::sock5_read_packet(int direction)
 
     // We must divide reads by direction to not permit second read call on the same socket.
     if (direction & 0x01)
-        in_socket.async_receive(boost::asio::buffer(in_buf),
+        in_socket.async_read_some(boost::asio::buffer(in_buf),
             [this, self](boost::system::error_code ec, std::size_t length) {
                 if (!ec) {
                     DEBUG_LOG << "--> " << std::to_string(length) << " bytes";
@@ -236,13 +245,13 @@ void Session::sock5_read_packet(int direction)
                 {
                     ERROR_LOG << "closing session. Client socket read error" << ec.message();
                     // Most probably client closed socket. Let's close both sockets and exit session.
-                    in_socket.close();
-                    out_socket.close();
+                    destroy();
+                    //context_.stop();
                 }
             });
 
     if (direction & 0x2)
-        out_socket.async_receive(boost::asio::buffer(out_buf),
+        out_socket.async_read_some(boost::asio::buffer(out_buf),
             [this, self](boost::system::error_code ec, std::size_t length) {
                 if (!ec) {
 
@@ -253,8 +262,8 @@ void Session::sock5_read_packet(int direction)
                 {
                     ERROR_LOG << "closing session. Remote socket read error" << ec.message();
                     // Most probably remote server closed socket. Let's close both sockets and exit session.
-                    in_socket.close();
-                    out_socket.close();
+                    destroy();
+                    //context_.stop();
                 }
             });
 }
@@ -271,8 +280,7 @@ void Session::sock5_write_packet(int direction, size_t len)
                 else {
                     ERROR_LOG << "closing session. Client socket write error" << ec.message();
                     // Most probably client closed socket. Let's close both sockets and exit session.
-                    in_socket.close();
-                    out_socket.close();
+                    destroy();
                 }
             });
         break;
@@ -284,8 +292,7 @@ void Session::sock5_write_packet(int direction, size_t len)
                 else {
                     ERROR_LOG << "closing session. Remote socket write error", ec.message();
                     // Most probably remote server closed socket. Let's close both sockets and exit session.
-                    in_socket.close();
-                    out_socket.close();
+                    destroy();
                 }
             });
         break;
@@ -294,4 +301,27 @@ void Session::sock5_write_packet(int direction, size_t len)
 boost::asio::ip::tcp::socket& Session::socket()
 {
     return in_socket;
+}
+void Session::destroy()
+{
+    ERROR_LOG << "destroy session";
+    // Log::log_with_endpoint(in_endpoint, "disconnected, " + to_string(recv_len) + " bytes received, " + to_string(sent_len) + " bytes sent, lasted for " + to_string(time(nullptr) - start_time) + " seconds", Log::INFO);
+    boost::system::error_code ec;
+    resolver_.cancel();
+
+    if (in_socket.is_open()) {
+        in_socket.cancel(ec);
+        in_socket.shutdown(tcp::socket::shutdown_both, ec);
+        in_socket.close(ec);
+    }
+
+    if (out_socket.is_open()) {
+        auto self = shared_from_this();
+
+        out_socket.cancel(ec);
+        out_socket.shutdown(tcp::socket::shutdown_both, ec);
+        out_socket.close();
+        //  ssl_shutdown_timer.expires_after(chrono::seconds(SSL_SHUTDOWN_TIMEOUT));
+        // ssl_shutdown_timer.async_wait(ssl_shutdown_cb);
+    }
 }

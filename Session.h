@@ -29,9 +29,11 @@ public:
     void do_connect(tcp::resolver::iterator&);
     void write_socks5_response();
     void sock5_write_packet(int, size_t);
+    void destroy();
 
 private:
     static constexpr size_t MAX_BUFF_SIZE = 8192;
+    boost::asio::io_context& context_;
     tcp::socket in_socket;
     tcp::socket out_socket;
     //
