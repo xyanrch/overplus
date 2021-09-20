@@ -27,10 +27,10 @@ void Server::do_accept()
             return;
         }
         if (!ec) {
+            NOTICE_LOG << "accept incoming connection :" << ec.message() << std::endl;
             new_session->start();
-        }
-        {
-            NOTICE_LOG<<"accept incoming connection fail:"<<ec.message()<<std::endl;
+        } else {
+            NOTICE_LOG << "accept incoming connection fail:" << ec.message() << std::endl;
         }
         do_accept();
     });
