@@ -11,6 +11,7 @@ target_sources(srclib
     Session.cpp
     Server.cpp
     IoContextPool.cpp
+    Log.cpp
     )
 add_executable(overplus main.cpp)
 find_package(Boost  COMPONENTS system thread REQUIRED)

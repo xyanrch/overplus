@@ -1,5 +1,6 @@
 #include "Server.h"
 #include <boost/asio/io_context.hpp>
+#include <cstdlib>
 #include <memory>
 
 Server::Server(const std::string& address, const std::string& port)
@@ -21,18 +22,22 @@ Server::Server(const std::string& address, const std::string& port)
 void Server::do_accept()
 {
     new_session.reset(new Session(context_pool.get_io_context()));
-    acceptor_.async_accept(new_session->socket(),[this](auto ec) {
+    acceptor_.async_accept(new_session->socket(), [this](auto ec) {
         if (!acceptor_.is_open()) {
             return;
         }
         if (!ec) {
             new_session->start();
         }
+        {
+            NOTICE_LOG<<"accept incoming connection fail:"<<ec.message()<<std::endl;
+        }
         do_accept();
     });
 }
 void Server::run()
 {
+    NOTICE_LOG << "Server start..." << std::endl;
     io_context.run();
 }
 void Server::add_signals()
@@ -42,5 +47,10 @@ void Server::add_signals()
 #ifdef SIGQUIT
     signals.add(SIGQUIT);
 #endif
-    signals.async_wait([this](auto ec, auto sig) { acceptor_.close(); });
+    signals.async_wait([this](auto ec, auto sig) {
+        acceptor_.close();
+
+        NOTICE_LOG << "Server stopped..." << std::endl;
+        exit(1);
+    });
 }

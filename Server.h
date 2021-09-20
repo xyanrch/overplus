@@ -6,6 +6,7 @@
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/signal_set.hpp>
 #include <memory>
+#include"Log.h"
 using namespace boost::asio;
 
 class Server : private boost::noncopyable {
