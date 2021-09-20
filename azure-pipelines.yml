@@ -1,0 +1,41 @@
+stages:
+
+- stage: Build
+  jobs:
+
+  - job: Linux
+    pool:
+      vmImage: ubuntu-latest
+    container:
+      image: overplus/centos-build:latest
+    steps:
+    - script: |
+        set -euo pipefail
+        echo 'target_link_libraries(trojan dl)' >> CMakeLists.txt
+        cmake .
+        make
+        strip -s overplus
+    - publish: $(System.DefaultWorkingDirectory)/overplus
+      artifact: LinuxBinary
+
+- stage: Package
+  jobs:
+
+  - job: Linux
+    pool:
+      vmImage: ubuntu-latest
+    steps:
+    - download: current
+      artifact: LinuxBinary
+    - script: |
+        set -euo pipefail
+        BINARY="$PIPELINE_WORKSPACE/LinuxBinary/overplus"
+        chmod +x "$BINARY"
+        mkdir overplus
+        cp "$BINARY" overplus/overplus
+        tar cf overplus-linux-amd64.tar overplus
+        xz overplus-linux-amd64.tar
+      env:
+        PIPELINE_WORKSPACE: $(Pipeline.Workspace)
+    - publish: $(System.DefaultWorkingDirectory)/overplus-linux-amd64.tar.xz
+      artifact: LinuxRelease
