@@ -17,7 +17,9 @@ target_sources(srclib
     TrojanReq.cpp
     )
 add_executable(overplus main.cpp)
-find_package(Boost 1.66  COMPONENTS system thread REQUIRED)
+find_package(Boost 1.66  COMPONENTS system  REQUIRED)
+find_package(Threads REQUIRED)
+target_link_libraries(overplus pthread)
 target_include_directories(overplus PRIVATE ${Boost_INCLUDE_DIR})
 target_link_libraries(overplus ${Boost_LIBRARIES})
 find_package(OpenSSL REQUIRED)

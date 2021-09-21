@@ -8,7 +8,7 @@
 #define ANSI_COLOR_CYAN "\x1b[36m"
 #define ANSI_COLOR_RESET "\x1b[0m"
 
-Loglevel log_level = L_DEBUG;
+Loglevel log_level = L_NOTICE;
 static std::string levelToString(Loglevel l)
 {
     switch (l) {
