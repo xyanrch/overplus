@@ -68,7 +68,7 @@ void ServerSession::do_resolve()
 {
     auto self(shared_from_this());
 
-    resolver_.async_resolve(tcp::resolver::query({ req.address.address, std::to_string(req.address.port) }),
+    resolver_.async_resolve(tcp::resolver::query(req.address.address, std::to_string(req.address.port)),
         [this, self](const boost::system::error_code& ec, tcp::resolver::iterator it) {
             if (!ec) {
                 do_connect(it);
