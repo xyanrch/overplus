@@ -1,4 +1,5 @@
 #include "ServerSession.h"
+#include "Log.h"
 #include <cstring>
 #include <string>
 
@@ -8,6 +9,8 @@ ServerSession::ServerSession(boost::asio::io_context& ioctx, boost::asio::ssl::c
     , in_ssl_socket(ioctx, sslctx)
     , out_socket(ioctx)
     , resolver_(ioctx)
+    , in_buf(MAX_BUFF_SIZE)
+    , out_buf(MAX_BUFF_SIZE)
 
 {
 }
@@ -15,7 +18,7 @@ void ServerSession::start()
 {
     auto self = shared_from_this();
     auto ep = in_ssl_socket.next_layer().remote_endpoint();
-    NOTICE_LOG << " start ep:" << ep.address().to_string();
+    // NOTICE_LOG << " start ep:" << ep.address().to_string();
     //ssl handshake
     in_ssl_socket.async_handshake(boost::asio::ssl::stream_base::server, [this, self](auto error) {
         if (error) {
@@ -30,6 +33,8 @@ void ServerSession::handle_trojan_handshake()
 {
     //trojan handshak
     auto self = shared_from_this();
+    //in_ssl_socket.next_layer().read_some(boost::asio::buffer)read_some()
+    // char temp[4096];
     in_ssl_socket.async_read_some(boost::asio::buffer(in_buf),
         [this, self](boost::system::error_code ec, std::size_t length) {
             if (ec) {
@@ -37,10 +42,10 @@ void ServerSession::handle_trojan_handshake()
                 destroy();
                 return;
             }
-            NOTICE_LOG << "error code:" << ec.message() << "trojan request: len =" << length << " data:" << std::string(in_buf.data(), length);
+            //NOTICE_LOG << "error code:" << ec.message() << "trojan request: len =" << length << " data:" << std::string(in_buf.data(), length);
             if (length == 0) {
                 // handle_trojan_handshake();
-                //return;
+                //   return;
             }
             bool valid = req.parse(std::string(in_buf.data(), length)) != -1;
             if (valid) {
@@ -72,14 +77,26 @@ void ServerSession::do_connect(tcp::resolver::iterator& it)
 {
     auto self(shared_from_this());
     out_socket.async_connect(*it,
-        [this, self](const boost::system::error_code& ec) {
+        [this, self, it](const boost::system::error_code& ec) {
             if (!ec) {
-                DEBUG_LOG << "connected to " << remote_host << ":" << remote_port;
+                DEBUG_LOG << "connected to " << req.address.address << ":" << req.address.port;
                 // write_socks5_response();
                 //TODO
                 if (req.payload.empty() == false) {
-                    std::memcpy(out_buf.data(), req.payload.data(), req.payload.length());
-                    out_async_write(2, req.payload.length());
+                    DEBUG_LOG << "payload not empty";
+                    //std::memcpy(out_buf.data(), req.payload.data(), req.payload.length());
+                    // out_async_write(1, req.payload.length());
+
+                    boost::asio::async_write(out_socket, boost::asio::buffer(req.payload),
+                        [this, self](boost::system::error_code ec, std::size_t length) {
+                            if (!ec)
+                                in_async_read(3);
+                            else {
+                                ERROR_LOG << "closing session. Client socket write error" << ec.message();
+                                // Most probably client closed socket. Let's close both sockets and exit session.
+                                destroy();
+                            }
+                        });
                 }
                 //read packet from both dirction
                 else

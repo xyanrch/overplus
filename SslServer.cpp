@@ -37,10 +37,10 @@ SslServer::SslServer(const std::string& address, const std::string& port)
     ssl_context_.use_private_key_file("server.key", boost::asio::ssl::context::pem);
     //ssl_context_.use_tmp_dh_file("dh512.pem");
     //
-    ssl_context_.use_tmp_dh(boost::asio::const_buffer(g_dh2048_sz, g_dh2048_sz_size));
+    // ssl_context_.use_tmp_dh(boost::asio::const_buffer(g_dh2048_sz, g_dh2048_sz_size));
 
     auto native_context = ssl_context_.native_handle();
-    const char* config = "http/1.1";
+    /*const char* config = "http/1.1";
     SSL_CTX_set_alpn_select_cb(
         native_context, [](SSL*, const unsigned char** out, unsigned char* outlen, const unsigned char* in, unsigned int inlen, void* config) -> int {
             if (SSL_select_next_proto((unsigned char**)out, outlen, (unsigned char*)(config), std::strlen((const char*)config), in, inlen) != OPENSSL_NPN_NEGOTIATED) {
@@ -48,7 +48,7 @@ SslServer::SslServer(const std::string& address, const std::string& port)
             }
             return SSL_TLSEXT_ERR_OK;
         },
-        &config);
+        &config);*/
     acceptor_.open(endpoint.protocol());
     acceptor_.set_option(ip::tcp::acceptor::reuse_address(true));
     acceptor_.bind(endpoint);

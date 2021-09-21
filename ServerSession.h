@@ -49,4 +49,5 @@ private:
     std::vector<char> out_buf;
     State state_ { HANDSHAKE };
     TrojanReq req {};
+    //unsigned char temp[4096] {};
 };
