@@ -9,9 +9,12 @@ add_library(srclib "")
 target_sources(srclib
     PRIVATE
     Session.cpp
+    ServerSession.cpp
     Server.cpp
+    SslServer.cpp
     IoContextPool.cpp
     Log.cpp
+    TrojanReq.cpp
     )
 add_executable(overplus main.cpp)
 find_package(Boost 1.66  COMPONENTS system thread REQUIRED)
