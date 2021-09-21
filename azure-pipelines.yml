@@ -33,7 +33,7 @@ stages:
         mkdir overplus
         cp "$BINARY" overplus/overplus
         tar cf overplus-linux-amd64.tar overplus
-        xz trojan-linux-amd64.tar
+        xz overplus-linux-amd64.tar
       env:
         PIPELINE_WORKSPACE: $(Pipeline.Workspace)
     - publish: $(System.DefaultWorkingDirectory)/overplus-linux-amd64.tar.xz
