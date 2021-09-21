@@ -22,7 +22,7 @@ Server::Server(const std::string& address, const std::string& port)
 void Server::do_accept()
 {
     std::shared_ptr<Session> new_session = std::make_shared<Session>(context_pool.get_io_context());
-    acceptor_.async_accept(new_session->socket(), [this, new_session](auto ec) {
+    acceptor_.async_accept(new_session->socket(), [this, new_session](const boost::system::error_code& ec) {
         if (!acceptor_.is_open()) {
             return;
         }
@@ -51,7 +51,7 @@ void Server::add_signals()
 #ifdef SIGQUIT
     signals.add(SIGQUIT);
 #endif
-    signals.async_wait([this](auto ec, auto sig) {
+    signals.async_wait([this](const boost::system::error_code& ec, int sig) {
         acceptor_.close();
 
         NOTICE_LOG << "Server stopped..." << std::endl;

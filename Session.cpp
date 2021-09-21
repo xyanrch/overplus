@@ -35,7 +35,7 @@ void Session::do_read()
 void Session::sock5_handshake()
 {
     auto self(shared_from_this());
-    in_socket.async_read_some(boost::asio::buffer(in_buf), [self, this](auto ec, auto len) {
+    in_socket.async_read_some(boost::asio::buffer(in_buf), [self, this](const boost::system::error_code& ec, size_t len) {
         if (!ec) {
             if (len < 3 || in_buf[0] != 0x05) {
                 ERROR_LOG << "SOCKS5 handshake request is invalid. Closing session";

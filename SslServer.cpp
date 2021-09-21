@@ -30,9 +30,9 @@ SslServer::SslServer(const std::string& address, const std::string& port)
         boost::asio::ssl::context::default_workarounds
         | boost::asio::ssl::context::no_sslv2
         | boost::asio::ssl::context::single_dh_use);
-    ssl_context_.set_password_callback([this](auto size, auto purpose) {
-        return "";
-    });
+    // ssl_context_.set_password_callback([this](auto size, auto purpose) {
+    //    return "";
+    // });
     ssl_context_.use_certificate_chain_file("server.pem");
     ssl_context_.use_private_key_file("server.key", boost::asio::ssl::context::pem);
     //ssl_context_.use_tmp_dh_file("dh512.pem");
@@ -58,7 +58,7 @@ SslServer::SslServer(const std::string& address, const std::string& port)
 void SslServer::do_accept()
 {
     std::shared_ptr<ServerSession> new_session = std::make_shared<ServerSession>(context_pool.get_io_context(), ssl_context_);
-    acceptor_.async_accept(new_session->socket(), [this, new_session](auto ec) {
+    acceptor_.async_accept(new_session->socket(), [this, new_session](const boost::system::error_code& ec) {
         if (!acceptor_.is_open()) {
             return;
         }
@@ -87,7 +87,7 @@ void SslServer::add_signals()
 #ifdef SIGQUIT
     signals.add(SIGQUIT);
 #endif
-    signals.async_wait([this](auto ec, auto sig) {
+    signals.async_wait([this](const boost::system::error_code& ec, int sig) {
         acceptor_.close();
 
         NOTICE_LOG << "SslServer stopped..." << std::endl;
