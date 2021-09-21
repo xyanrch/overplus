@@ -7,7 +7,7 @@ stages:
     pool:
       vmImage: ubuntu-latest
     container:
-      image: overplus/centos-build:latest
+      image: trojangfw/centos-build:latest
     steps:
     - script: |
         set -euo pipefail
