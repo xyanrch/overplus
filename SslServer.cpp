@@ -3,28 +3,20 @@
 #include <cstdlib>
 #include <cstring>
 #include <memory>
+#include <string>
 
-const char g_dh2048_sz[] = "-----BEGIN DH PARAMETERS-----\n"
-                           "MIIBCAKCAQEA///////////JD9qiIWjCNMTGYouA3BzRKQJOCIpnzHQCC76mOxOb\n"
-                           "IlFKCHmONATd75UZs806QxswKwpt8l8UN0/hNW1tUcJF5IW1dmJefsb0TELppjft\n"
-                           "awv/XLb0Brft7jhr+1qJn6WunyQRfEsf5kkoZlHs5Fs9wgB8uKFjvwWY2kg2HFXT\n"
-                           "mmkWP6j9JM9fg2VdI9yjrZYcYvNWIIVSu57VKQdwlpZtZww1Tkq8mATxdGwIyhgh\n"
-                           "fDKQXkYuNs474553LBgOhgObJ4Oi7Aeij7XFXfBvTFLJ3ivL9pVYFxg5lUl86pVq\n"
-                           "5RXSJhiY+gUQFXKOWoqsqmj//////////wIBAg==\n"
-                           "-----END DH PARAMETERS-----";
-
-constexpr size_t g_dh2048_sz_size = sizeof(g_dh2048_sz);
-
-SslServer::SslServer(const std::string& address, const std::string& port)
+SslServer::SslServer(const std::string& config_path)
     : context_pool(5)
     , io_context(context_pool.get_io_context())
     , signals(io_context)
     , acceptor_(io_context)
     , ssl_context_(boost::asio::ssl::context::sslv23)
 {
+    config_manage.load_config(config_path, ConfigManage::Server);
+    log_level = config_manage.server_cfg.log_level;
     add_signals();
     ip::tcp::resolver resover(io_context);
-    ip::tcp::endpoint endpoint = *resover.resolve(address, port).begin();
+    ip::tcp::endpoint endpoint = *resover.resolve(config_manage.server_cfg.local_addr, config_manage.server_cfg.local_port).begin();
     //
     ssl_context_.set_options(
         boost::asio::ssl::context::default_workarounds
@@ -33,8 +25,8 @@ SslServer::SslServer(const std::string& address, const std::string& port)
     // ssl_context_.set_password_callback([this](auto size, auto purpose) {
     //    return "";
     // });
-    ssl_context_.use_certificate_chain_file("server.pem");
-    ssl_context_.use_private_key_file("server.key", boost::asio::ssl::context::pem);
+    ssl_context_.use_certificate_chain_file(config_manage.server_cfg.certificate_chain);
+    ssl_context_.use_private_key_file(config_manage.server_cfg.server_private_key, boost::asio::ssl::context::pem);
     //ssl_context_.use_tmp_dh_file("dh512.pem");
     //
     // ssl_context_.use_tmp_dh(boost::asio::const_buffer(g_dh2048_sz, g_dh2048_sz_size));

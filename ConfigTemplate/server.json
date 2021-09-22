@@ -1,0 +1,14 @@
+{
+    "run_type": "server",
+    "local_addr": "0.0.0.0",
+    "local_port": "443",
+    "allowed_passwords": [
+        "password1",
+        "password2"
+    ],
+    "log_level": "DEBUG",
+    "ssl": {
+        "cert": "/path/to/certificate.crt",
+        "key": "/path/to/private.key"
+    }
+}

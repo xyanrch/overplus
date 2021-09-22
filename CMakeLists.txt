@@ -15,6 +15,7 @@ target_sources(srclib
     IoContextPool.cpp
     Log.cpp
     TrojanReq.cpp
+    ConfigManage.cpp
     )
 add_executable(overplus main.cpp)
 find_package(Boost 1.66  COMPONENTS system  REQUIRED)

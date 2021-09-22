@@ -4,10 +4,7 @@
 
 int main()
 {
-    std::string address("0.0.0.0");
-    std::string port("443");
-
-    SslServer server(address, port);
+    SslServer server("server.json");
     server.run();
 
     return 0;
