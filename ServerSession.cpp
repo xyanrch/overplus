@@ -1,4 +1,5 @@
 #include "ServerSession.h"
+#include "ConfigManage.h"
 #include "Log.h"
 #include <cstring>
 #include <string>
@@ -45,6 +46,11 @@ void ServerSession::handle_trojan_handshake()
             bool valid = req.parse(std::string(in_buf.data(), length)) != -1;
             if (valid) {
                 //
+                if (!ConfigManage::instance().server_cfg.allowed_passwords.count(req.password)) {
+                    ERROR_LOG << "unspoorted password from client....,end session";
+                    destroy();
+                    return;
+                }
 
             } else {
                 ERROR_LOG << "parse trojan request fail";

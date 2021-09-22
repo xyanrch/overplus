@@ -5,14 +5,14 @@
 #include <memory>
 #include <string>
 
-SslServer::SslServer(const std::string& config_path)
+SslServer::SslServer()
     : context_pool(5)
     , io_context(context_pool.get_io_context())
     , signals(io_context)
     , acceptor_(io_context)
     , ssl_context_(boost::asio::ssl::context::sslv23)
 {
-    config_manage.load_config(config_path, ConfigManage::Server);
+    auto& config_manage = ConfigManage::instance();
     log_level = config_manage.server_cfg.log_level;
     add_signals();
     ip::tcp::resolver resover(io_context);

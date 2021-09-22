@@ -35,7 +35,7 @@ struct ServerConfig {
 struct ClientConfig {
     //todo
 };
-class ConfigManage {
+class ConfigManage : private boost::noncopyable {
 
 public:
     enum ConfigType {
@@ -43,10 +43,14 @@ public:
         Client
 
     };
-    ConfigManage() = default;
+
     void load_config(const std::string&, ConfigType);
+    static ConfigManage& instance();
 
 public:
     ClientConfig client_cfg;
     ServerConfig server_cfg;
+
+private:
+    ConfigManage() = default;
 };

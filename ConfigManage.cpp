@@ -35,6 +35,12 @@ static std::string SHA224(const std::string& message)
     EVP_MD_CTX_free(ctx);
     return std::string(mdString);
 }
+
+ConfigManage& ConfigManage::instance()
+{
+    static ConfigManage instance;
+    return instance;
+}
 void ConfigManage::load_config(const std::string& path, ConfigType type)
 {
     if (type == ConfigType::Server) {

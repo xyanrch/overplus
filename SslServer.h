@@ -12,7 +12,7 @@ using namespace boost::asio;
 
 class SslServer : private boost::noncopyable {
 public:
-    SslServer(const std::string& config_path);
+    SslServer();
     void run();
 
 private:
@@ -27,7 +27,4 @@ private:
     boost::asio::signal_set signals;
     boost::asio::ip::tcp::acceptor acceptor_;
     boost::asio::ssl::context ssl_context_;
-
-private:
-    ConfigManage config_manage;
 };

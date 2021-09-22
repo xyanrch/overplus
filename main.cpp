@@ -4,7 +4,8 @@
 
 int main()
 {
-    SslServer server("server.json");
+    ConfigManage::instance().load_config("server.json", ConfigManage::Server);
+    SslServer server;
     server.run();
 
     return 0;
