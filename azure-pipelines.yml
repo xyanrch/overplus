@@ -32,6 +32,7 @@ stages:
         chmod +x "$BINARY"
         mkdir overplus
         cp "$BINARY" overplus/overplus
+        cp -r ConfigTemplate overplus
         tar cf overplus-linux-amd64.tar overplus
         xz overplus-linux-amd64.tar
       env:
