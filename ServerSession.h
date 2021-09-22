@@ -1,6 +1,6 @@
 #pragma once
 #include "Log.h"
-#include "TrojanReq.h"
+#include "Protocal/TrojanReq.h"
 #include <boost/asio.hpp>
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/ssl.hpp>

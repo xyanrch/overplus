@@ -14,7 +14,7 @@ target_sources(srclib
     SslServer.cpp
     IoContextPool.cpp
     Log.cpp
-    TrojanReq.cpp
+    Protocal/TrojanReq.cpp
     ConfigManage.cpp
     )
 add_executable(overplus main.cpp)
