@@ -42,21 +42,10 @@ void ServerSession::handle_trojan_handshake()
                 destroy();
                 return;
             }
-            //NOTICE_LOG << "error code:" << ec.message() << "trojan request: len =" << length << " data:" << std::string(in_buf.data(), length);
-            if (length == 0) {
-                // handle_trojan_handshake();
-                //   return;
-            }
             bool valid = req.parse(std::string(in_buf.data(), length)) != -1;
             if (valid) {
                 //
-                //TODO verify password
 
-                // if (req.password != "yanyun90") {
-                //NOTICE_LOG << "unspported password:" << req.password;
-                // destroy();
-                //return;
-                //  }
             } else {
                 ERROR_LOG << "parse trojan request fail";
                 return;
