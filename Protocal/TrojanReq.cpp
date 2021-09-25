@@ -74,7 +74,7 @@ string SOCKS5Address::generate(const boost::asio::ip::udp::endpoint& endpoint)
     ret += char(uint8_t(endpoint.port() & 0xFF));
     return ret;
 }
-int TrojanReq::parse(const string_view& data)
+int TrojanReq::parse(const string& data)
 {
     size_t first = data.find("\r\n");
     if (first == string::npos) {

@@ -3,7 +3,6 @@
 #include "Shared/Log.h"
 #include <cstring>
 #include <string>
-#include <string_view>
 
 ServerSession::ServerSession(boost::asio::io_context& ioctx, boost::asio::ssl::context& sslctx)
 
@@ -44,30 +43,18 @@ void ServerSession::handle_trojan_handshake()
                 destroy();
                 return;
             }
-            std::string_view str_view(in_buf.data(), length);
-            bool valid = vreq.unstream(str_view);
+            bool valid = req.parse(std::string(in_buf.data(), length)) != -1;
             if (valid) {
-                NOTICE_LOG << "received vrequest";
+                //
                 if (!ConfigManage::instance().server_cfg.allowed_passwords.count(req.password)) {
                     ERROR_LOG << "unspoorted password from client....,end session";
                     destroy();
                     return;
                 }
+
             } else {
-                valid = req.parse(str_view) != -1;
-
-                if (valid) {
-                    //
-                    if (!ConfigManage::instance().server_cfg.allowed_passwords.count(req.password)) {
-                        ERROR_LOG << "unspoorted password from client....,end session";
-                        destroy();
-                        return;
-                    }
-
-                } else {
-                    ERROR_LOG << "parse trojan request fail";
-                    return;
-                }
+                ERROR_LOG << "parse trojan request fail";
+                return;
             }
             do_resolve();
         });

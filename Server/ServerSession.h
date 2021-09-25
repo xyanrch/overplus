@@ -1,5 +1,4 @@
 #pragma once
-#include "Protocal/VplusProtocal/VRequest.h"
 #include "Shared/Log.h"
 #include <Protocal/TrojanReq.h>
 #include <boost/asio.hpp>
@@ -34,7 +33,7 @@ public:
     void destroy();
 
 private:
-    static constexpr size_t MAX_BUFF_SIZE = 16348;
+    static constexpr size_t MAX_BUFF_SIZE = 8192;
     //SSLSocket ssl_socket;
     boost::asio::io_context& io_context_;
     SSLSocket in_ssl_socket;
@@ -50,5 +49,5 @@ private:
     std::vector<char> out_buf;
     State state_ { HANDSHAKE };
     TrojanReq req {};
-    VRequest vreq{};
+    //unsigned char temp[4096] {};
 };
