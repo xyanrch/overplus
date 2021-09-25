@@ -16,5 +16,3 @@ find_package(OpenSSL REQUIRED)
 target_link_libraries(overplus pthread shared server proto OpenSSL::SSL)
 target_include_directories(overplus PRIVATE ${Boost_INCLUDE_DIR})
 target_link_libraries(overplus ${Boost_LIBRARIES})
-
-#target_link_libraries(YAN compiler)
