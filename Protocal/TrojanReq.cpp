@@ -1,5 +1,5 @@
 #include "TrojanReq.h"
-#include "../Log.h"
+#include "Shared/Log.h"
 using namespace std;
 bool SOCKS5Address::parse(const string& data, size_t& address_len)
 {

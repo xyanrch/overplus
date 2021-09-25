@@ -16,7 +16,7 @@ public:
     };
 
     void stream(std::string& buf);
-      void unstream(const std::string& buf);
+      bool unstream(const std::string& buf);
     
 
 private:

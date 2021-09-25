@@ -1,6 +1,6 @@
 #include "ServerSession.h"
-#include "ConfigManage.h"
-#include "Log.h"
+#include "Shared/ConfigManage.h"
+#include "Shared/Log.h"
 #include <cstring>
 #include <string>
 
