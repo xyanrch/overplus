@@ -184,8 +184,10 @@ boost::asio::ip::tcp::socket& ServerSession::socket()
 void ServerSession::destroy()
 {
     boost::system::error_code ec;
+    out_socket.close();
+    in_ssl_socket.next_layer().close();
     //  resolver.cancel();
-    if (out_socket.is_open()) {
+    /*  if (out_socket.is_open()) {
         out_socket.cancel(ec);
         out_socket.shutdown(tcp::socket::shutdown_both, ec);
         out_socket.close(ec);
@@ -208,4 +210,5 @@ void ServerSession::destroy()
         // ssl_shutdown_timer.expires_after(chrono::seconds(SSL_SHUTDOWN_TIMEOUT));
         //ssl_shutdown_timer.async_wait(ssl_shutdown_cb);
     }
+    */
 }

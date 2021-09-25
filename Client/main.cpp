@@ -5,7 +5,7 @@
 
 int main()
 {
-    ConfigManage::instance().load_config("server.json", ConfigManage::Server);
+    //ConfigManage::instance().load_config("client.json", ConfigManage::Server);
     Server server("0.0.0.0", "1080");
     server.run();
 
