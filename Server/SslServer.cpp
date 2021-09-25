@@ -32,6 +32,8 @@ SslServer::SslServer()
     // ssl_context_.use_tmp_dh(boost::asio::const_buffer(g_dh2048_sz, g_dh2048_sz_size));
 
     auto native_context = ssl_context_.native_handle();
+    SSL_CTX_set_session_cache_mode(native_context, SSL_SESS_CACHE_SERVER);
+
     /*const char* config = "http/1.1";
     SSL_CTX_set_alpn_select_cb(
         native_context, [](SSL*, const unsigned char** out, unsigned char* outlen, const unsigned char* in, unsigned int inlen, void* config) -> int {
