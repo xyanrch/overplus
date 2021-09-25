@@ -1,7 +1,7 @@
 #ifndef SERVER_H_
 #define SERVER_H_
-#include "IoContextPool.h"
-#include "Log.h"
+#include "Shared/IoContextPool.h"
+#include "Shared/Log.h"
 #include "Session.h"
 #include <boost/asio.hpp>
 #include <boost/asio/io_context.hpp>
