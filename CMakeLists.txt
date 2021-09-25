@@ -18,7 +18,7 @@ target_link_libraries(overplus pthread shared server proto OpenSSL::SSL)
 target_include_directories(overplus PRIVATE ${Boost_INCLUDE_DIR})
 target_link_libraries(overplus ${Boost_LIBRARIES})
 ##
-add_executable(overplus_client Client/client_main.cpp)
+add_executable(overplus_client Client/main.cpp)
 target_link_libraries(overplus_client pthread shared client proto OpenSSL::SSL)
 target_include_directories(overplus_client PRIVATE ${Boost_INCLUDE_DIR})
 target_link_libraries(overplus_client ${Boost_LIBRARIES})
