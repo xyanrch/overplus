@@ -1,6 +1,7 @@
 
 #include "VRequest.h"
 #include "Coding.h"
+#include "Shared/Log.h"
 #include <cstdint>
 /*
  struct Header {
@@ -19,7 +20,7 @@
 void VRequest::stream(std::string& buf)
 {
     //header.len = sizeof(Header)+password.length()+sizeof(Command)+sizeof(AddressType)+address.length()+sizeof(port);
-    Coding::EncodeFixed8(buf,header.version);
+    Coding::EncodeFixed32(buf, 0xffffffff);
     Coding::EncodeFixed32(buf, header.len);
     //
     Coding::EncodeFixed32(buf, password.length());
@@ -33,35 +34,37 @@ void VRequest::stream(std::string& buf)
     //
     Coding::EncodeFixed16(buf, port);
 }
-bool VRequest::unstream(const std::string& buf)
+bool VRequest::unstream(const std::string_view& buf)
 {
-    if(buf.length()<sizeof(Header))
-    {
+    if (buf.length() < sizeof(Header)) {
 
         return false;
     }
     //int pos = 0;
-    char* ptr  = const_cast<char*>(buf.data());
-    this->header.version = ptr[0];
-    ptr++;
-    this->header.len = Coding::DecodeFixed32(ptr);
-    if(header.len>buf.length())
-    {
+    char* ptr = const_cast<char*>(buf.data());
+    this->header.version = Coding::DecodeFixed32(ptr);
+    if (this->header.version != 0xffffffff) {
+        ERROR_LOG << "unspported protocal, expected vprotocal";
         return false;
     }
-    ptr +=4;
+    ptr += 4;
+    this->header.len = Coding::DecodeFixed32(ptr);
+    if (header.len > buf.length()) {
+        return false;
+    }
+    ptr += 4;
     uint32_t len = Coding::DecodeFixed32(ptr);
-    ptr+=4;
+    ptr += 4;
     this->password = Coding::DecodeStr(ptr, len);
-    ptr +=len;
+    ptr += len;
     this->command = static_cast<Command>(*ptr);
     ptr++;
     this->address_type = static_cast<AddressType>(*ptr);
     ptr++;
     len = Coding::DecodeFixed32(ptr);
-    ptr+=4;
+    ptr += 4;
     this->address = Coding::DecodeStr(ptr, len);
-    ptr+=len;
+    ptr += len;
     this->port = Coding::DecodeFixed16(ptr);
     return true;
 }

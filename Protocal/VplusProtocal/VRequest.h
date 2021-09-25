@@ -16,12 +16,12 @@ public:
     };
 
     void stream(std::string& buf);
-      bool unstream(const std::string& buf);
+      bool unstream(const std::string_view& buf);
     
 
 private:
     struct Header {
-        uint8_t version;
+        uint32_t version;//fixed 0xFF 0xFF 0xFF 0xFF 
         std::uint32_t len;
     };
     Header header;
