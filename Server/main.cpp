@@ -8,7 +8,7 @@
 int main()
 {
     ConfigManage::instance().load_config("server.json", ConfigManage::Server);
-    LogFile logfile_("log/server", 10 * 1024 * 1024);
+    LogFile logfile_("log", 10 * 1024 * 1024);
     logger::setOutput([&](std::string&& buf) {
         logfile_.append(std::move(buf));
     });
