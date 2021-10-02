@@ -10,6 +10,10 @@
 #define ANSI_COLOR_RESET "\x1b[0m"
 
 Loglevel log_level = L_NOTICE;
+void set_log_level(Loglevel level)
+{
+    log_level = level;
+}
 static std::function<void()> flush_ = []() {
     std::flush(std::cout);
 };

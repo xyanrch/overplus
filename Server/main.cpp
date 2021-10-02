@@ -15,6 +15,7 @@ int main()
     logger::setFlush([&]() {
         logfile_.flush();
     });
+
     SslServer server;
     server.run();
 

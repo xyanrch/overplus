@@ -1,13 +1,15 @@
 #pragma once
+#include <cstdint>
 #include <functional>
 #include <iostream>
 #include <sstream>
 
-enum Loglevel {
+enum Loglevel :uint8_t{
     L_DEBUG,
     L_NOTICE,
     L_ERROR_EXIT
 };
+void set_log_level(Loglevel level);
 class logger {
 public:
     logger(const char* func, int line, Loglevel level);
