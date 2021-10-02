@@ -10,8 +10,7 @@
 #define ANSI_COLOR_RESET "\x1b[0m"
 
 Loglevel log_level = L_NOTICE;
-static std::function<void()> flush_ = []()
-{
+static std::function<void()> flush_ = []() {
     std::flush(std::cout);
 };
 static std::function<void(std::string&&)> output_ = [](std::string&& buf) {
@@ -77,5 +76,5 @@ logger::Impl::Impl(Loglevel level)
 }
 logger::Impl::~Impl()
 {
-    log_stream_ << std::endl;
+    log_stream_ << "\n";
 }
