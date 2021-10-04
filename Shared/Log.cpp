@@ -10,28 +10,19 @@
 #define ANSI_COLOR_RESET "\x1b[0m"
 
 Loglevel log_level = L_NOTICE;
-void set_log_level(Loglevel level)
-{
-    log_level = level;
-}
+static Destination log_dest = D_STDOUT;
+
 static std::function<void()> flush_ = []() {
     std::flush(std::cout);
 };
 static std::function<void(std::string&&)> output_ = [](std::string&& buf) {
     std::cout << buf;
 };
+const char* level_str[] {
+    "[DEBUG] ",
+    "[NOTICE] ",
+    "[ERROR] "
 
-static std::string levelToString(Loglevel l)
-{
-    switch (l) {
-    case L_DEBUG:
-        return "[DEBUG] ";
-    case L_NOTICE:
-        return "[NOTICE] ";
-    case L_ERROR_EXIT:
-        return "[ERROR] ";
-    }
-    return "[NA]";
 };
 
 static std::string get_format_time()
@@ -39,7 +30,7 @@ static std::string get_format_time()
     time_t timep;
     time(&timep);
     char tmp[64];
-    std::strftime(tmp, sizeof(tmp), "[%Y-%m-%d %h:%M:%S]", std::localtime(&timep));
+    std::strftime(tmp, sizeof(tmp), "[%Y-%m-%d %H:%M:%S]", std::localtime(&timep));
     return tmp;
 }
 void logger::setOutput(std::function<void(std::string&&)>&& outputFunc)
@@ -50,6 +41,18 @@ void logger::setFlush(std::function<void()>&& flush)
 {
     flush_ = flush;
 }
+void logger::set_log_level(Loglevel level)
+{
+    log_level = level;
+}
+Loglevel logger::get_log_level()
+{
+    return log_level;
+}
+void logger::set_log_destination(Destination dest)
+{
+    log_dest = dest;
+}
 logger::~logger()
 {
     //auto buf = impl.log_stream_.str();
@@ -59,23 +62,34 @@ logger::~logger()
         //abort();
     }
 }
-logger::logger(const char* func, int line, Loglevel level)
-    : impl(func, line, level)
+logger::logger(const char* file, const char* func, int line, Loglevel level)
+    : impl(file, func, line, level)
 {
 }
 logger::logger(Loglevel level)
     : impl(level)
 {
 }
-logger::Impl::Impl(const char* func, int line, Loglevel level)
+logger::Impl::Impl(const char* file, const char* func, int line, Loglevel level)
 {
-    log_stream_ << get_format_time() << ANSI_COLOR_GREEN << levelToString(level) << ANSI_COLOR_RESET << func << ": line: " << line << " ";
+    if (log_dest == D_STDOUT) {
+        log_stream_ << get_format_time() << ANSI_COLOR_GREEN << level_str[level] << ANSI_COLOR_RESET << file << " " << func << ": line: " << line << " ";
+    } else {
+        log_stream_ << get_format_time() << level_str[level] << file << " " << func << ": line: " << line << " ";
+    }
+
     level_ = level;
 }
 
 logger::Impl::Impl(Loglevel level)
 {
-    log_stream_ << get_format_time() << ANSI_COLOR_RED << levelToString(level) << ANSI_COLOR_RESET << " ";
+    if (log_dest == D_STDOUT) {
+        log_stream_ << get_format_time() << ANSI_COLOR_RED << level_str[level] << ANSI_COLOR_RESET << " ";
+
+    } else {
+        log_stream_ << get_format_time() << level_str[level] << " ";
+    }
+    log_stream_ << "\n";
     level_ = level;
 }
 logger::Impl::~Impl()

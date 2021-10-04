@@ -57,9 +57,7 @@ void LogFile::append(std::string&& buf)
     if (muti_threads) {
         std::lock_guard<std::mutex> lock_guard(mutex_);
         append_unlocked(std::move(buf));
-    }
-    // else
-    {
+    } else {
         append_unlocked(std::move(buf));
     }
 }

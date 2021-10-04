@@ -13,7 +13,7 @@ SslServer::SslServer()
     , ssl_context_(boost::asio::ssl::context::sslv23)
 {
     auto& config_manage = ConfigManage::instance();
-    log_level = config_manage.server_cfg.log_level;
+   
     add_signals();
     ip::tcp::resolver resover(io_context);
     ip::tcp::endpoint endpoint = *resover.resolve(config_manage.server_cfg.local_addr, config_manage.server_cfg.local_port).begin();
