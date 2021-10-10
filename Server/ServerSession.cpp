@@ -23,7 +23,7 @@ void ServerSession::start()
     //ssl handshake
     in_ssl_socket.async_handshake(boost::asio::ssl::stream_base::server, [this, self](const boost::system::error_code& error) {
         if (error) {
-            // Log::log_with_endpoint(in_endpoint, "SSL handshake failed: " + error.message(), Log::ERROR);
+            ERROR_LOG << "SSL handshake failed: " << error.message();
             destroy();
             return;
         }
@@ -54,6 +54,7 @@ void ServerSession::handle_trojan_handshake()
 
             } else {
                 ERROR_LOG << "parse trojan request fail";
+                destroy();
                 return;
             }
             do_resolve();

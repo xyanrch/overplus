@@ -20,6 +20,7 @@ int main()
 
     SslServer server;
     server.run();
+    NOTICE_LOG<<"Server Stopped,will exit";
 
     return 0;
 }

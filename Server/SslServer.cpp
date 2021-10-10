@@ -13,7 +13,7 @@ SslServer::SslServer()
     , ssl_context_(boost::asio::ssl::context::sslv23)
 {
     auto& config_manage = ConfigManage::instance();
-   
+
     add_signals();
     ip::tcp::resolver resover(io_context);
     ip::tcp::endpoint endpoint = *resover.resolve(config_manage.server_cfg.local_addr, config_manage.server_cfg.local_port).begin();
@@ -44,7 +44,6 @@ SslServer::SslServer()
         },
         &config);*/
     acceptor_.open(endpoint.protocol());
-    acceptor_.set_option(ip::tcp::acceptor::reuse_address(true));
     acceptor_.bind(endpoint);
     acceptor_.listen();
     do_accept();
@@ -54,6 +53,7 @@ void SslServer::do_accept()
     std::shared_ptr<ServerSession> new_session = std::make_shared<ServerSession>(context_pool.get_io_context(), ssl_context_);
     acceptor_.async_accept(new_session->socket(), [this, new_session](const boost::system::error_code& ec) {
         if (!acceptor_.is_open()) {
+            NOTICE_LOG << "Acceptor socket is not open, stop calling myself";
             return;
         }
         if (ec == boost::asio::error::operation_aborted) {
@@ -61,7 +61,7 @@ void SslServer::do_accept()
             return;
         }
         if (!ec) {
-            NOTICE_LOG << "accept incoming connection :" << ec.message() << std::endl;
+            NOTICE_LOG << "accept incoming connection :" <<new_session->socket().remote_endpoint().address().to_string()<<" "<< ec.message() << std::endl;
             new_session->start();
         } else {
             NOTICE_LOG << "accept incoming connection fail:" << ec.message() << std::endl;

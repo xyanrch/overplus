@@ -89,7 +89,6 @@ logger::Impl::Impl(Loglevel level)
     } else {
         log_stream_ << get_format_time() << level_str[level] << " ";
     }
-    log_stream_ << "\n";
     level_ = level;
 }
 logger::Impl::~Impl()
