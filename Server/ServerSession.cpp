@@ -18,7 +18,6 @@ ServerSession::ServerSession(boost::asio::io_context& ioctx, boost::asio::ssl::c
 void ServerSession::start()
 {
     auto self = shared_from_this();
-    auto ep = in_ssl_socket.next_layer().remote_endpoint();
     // NOTICE_LOG << " start ep:" << ep.address().to_string();
     //ssl handshake
     in_ssl_socket.async_handshake(boost::asio::ssl::stream_base::server, [this, self](const boost::system::error_code& error) {

@@ -1,5 +1,6 @@
 #include "SslServer.h"
 #include <boost/asio/io_context.hpp>
+#include <boost/system/error_code.hpp>
 #include <cstdlib>
 #include <cstring>
 #include <memory>
@@ -61,8 +62,14 @@ void SslServer::do_accept()
             return;
         }
         if (!ec) {
-            NOTICE_LOG << "accept incoming connection :" <<new_session->socket().remote_endpoint().address().to_string()<<" "<< ec.message() << std::endl;
-            new_session->start();
+            boost::system::error_code error;
+            auto ep = new_session->socket().remote_endpoint(error);
+            if (!error) {
+                NOTICE_LOG << "accept incoming connection :" << ep.address().to_string();
+                new_session->start();
+            } else {
+                NOTICE_LOG << "get remote point error :" << error.message();
+            }
         } else {
             NOTICE_LOG << "accept incoming connection fail:" << ec.message() << std::endl;
         }
