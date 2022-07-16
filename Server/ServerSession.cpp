@@ -188,8 +188,8 @@ void ServerSession::destroy()
         out_socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
         out_socket.close();
     }
-    if (in_ssl_socket.is_open()) {
-        in_ssl_socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+    if (in_ssl_socket.next_layer().is_open()) {
+        in_ssl_socket.next_layer().shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
         in_ssl_socket.next_layer().close();
     }
     //  resolver.cancel();
