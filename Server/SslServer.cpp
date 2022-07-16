@@ -28,9 +28,9 @@ SslServer::SslServer()
     // });
     ssl_context_.use_certificate_chain_file(config_manage.server_cfg.certificate_chain);
     ssl_context_.use_private_key_file(config_manage.server_cfg.server_private_key, boost::asio::ssl::context::pem);
-    //ssl_context_.use_tmp_dh_file("dh512.pem");
+    // ssl_context_.use_tmp_dh_file("dh512.pem");
     //
-    // ssl_context_.use_tmp_dh(boost::asio::const_buffer(g_dh2048_sz, g_dh2048_sz_size));
+    //  ssl_context_.use_tmp_dh(boost::asio::const_buffer(g_dh2048_sz, g_dh2048_sz_size));
 
     auto native_context = ssl_context_.native_handle();
     SSL_CTX_set_session_cache_mode(native_context, SSL_SESS_CACHE_SERVER);
@@ -51,8 +51,8 @@ SslServer::SslServer()
 }
 void SslServer::do_accept()
 {
-    std::shared_ptr<ServerSession> new_session = std::make_shared<ServerSession>(context_pool.get_io_context(), ssl_context_);
-    acceptor_.async_accept(new_session->socket(), [this, new_session](const boost::system::error_code& ec) {
+    new_connection_.reset(new ServerSession(context_pool.get_io_context(), ssl_context_));
+    acceptor_.async_accept(new_connection_->socket(), [this](const boost::system::error_code& ec) {
         if (!acceptor_.is_open()) {
             NOTICE_LOG << "Acceptor socket is not open, stop calling myself";
             return;
@@ -63,16 +63,18 @@ void SslServer::do_accept()
         }
         if (!ec) {
             boost::system::error_code error;
-            auto ep = new_session->socket().remote_endpoint(error);
+            auto ep = new_connection_->socket().remote_endpoint(error);
             if (!error) {
                 NOTICE_LOG << "accept incoming connection :" << ep.address().to_string();
-                new_session->start();
+                new_connection_->start();
+
             } else {
                 NOTICE_LOG << "get remote point error :" << error.message();
             }
         } else {
             NOTICE_LOG << "accept incoming connection fail:" << ec.message() << std::endl;
         }
+
         do_accept();
     });
 }

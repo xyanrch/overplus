@@ -19,7 +19,7 @@ void ServerSession::start()
 {
     auto self = shared_from_this();
     // NOTICE_LOG << " start ep:" << ep.address().to_string();
-    //ssl handshake
+    // ssl handshake
     in_ssl_socket.async_handshake(boost::asio::ssl::stream_base::server, [this, self](const boost::system::error_code& error) {
         if (error) {
             ERROR_LOG << "SSL handshake failed: " << error.message();
@@ -31,10 +31,10 @@ void ServerSession::start()
 }
 void ServerSession::handle_trojan_handshake()
 {
-    //trojan handshak
+    // trojan handshak
     auto self = shared_from_this();
-    //in_ssl_socket.next_layer().read_some(boost::asio::buffer)read_some()
-    // char temp[4096];
+    // in_ssl_socket.next_layer().read_some(boost::asio::buffer)read_some()
+    //  char temp[4096];
     in_ssl_socket.async_read_some(boost::asio::buffer(in_buf),
         [this, self](boost::system::error_code ec, std::size_t length) {
             if (ec) {
@@ -82,11 +82,11 @@ void ServerSession::do_connect(tcp::resolver::iterator& it)
             if (!ec) {
                 DEBUG_LOG << "connected to " << req.address.address << ":" << req.address.port;
                 // write_socks5_response();
-                //TODO
+                // TODO
                 if (req.payload.empty() == false) {
                     DEBUG_LOG << "payload not empty";
-                    //std::memcpy(out_buf.data(), req.payload.data(), req.payload.length());
-                    // out_async_write(1, req.payload.length());
+                    // std::memcpy(out_buf.data(), req.payload.data(), req.payload.length());
+                    //  out_async_write(1, req.payload.length());
 
                     boost::asio::async_write(out_socket, boost::asio::buffer(req.payload),
                         [this, self](boost::system::error_code ec, std::size_t length) {
@@ -99,7 +99,7 @@ void ServerSession::do_connect(tcp::resolver::iterator& it)
                             }
                         });
                 }
-                //read packet from both dirction
+                // read packet from both dirction
                 else
                     in_async_read(3);
 
@@ -120,12 +120,12 @@ void ServerSession::in_async_read(int direction)
                     DEBUG_LOG << "--> " << std::to_string(length) << " bytes";
 
                     out_async_write(1, length);
-                } else //if (ec != boost::asio::error::eof)
+                } else // if (ec != boost::asio::error::eof)
                 {
                     ERROR_LOG << "closing session. Client socket read error" << ec.message();
                     // Most probably client closed socket. Let's close both sockets and exit session.
                     destroy();
-                    //context_.stop();
+                    // context_.stop();
                 }
             });
 
@@ -137,12 +137,12 @@ void ServerSession::in_async_read(int direction)
                     DEBUG_LOG << "<-- " << std::to_string(length) << " bytes";
 
                     out_async_write(2, length);
-                } else //if (ec != boost::asio::error::eof)
+                } else // if (ec != boost::asio::error::eof)
                 {
                     ERROR_LOG << "closing session. Remote socket read error" << ec.message();
                     // Most probably remote server closed socket. Let's close both sockets and exit session.
                     destroy();
-                    //context_.stop();
+                    // context_.stop();
                 }
             });
 }
@@ -184,8 +184,14 @@ boost::asio::ip::tcp::socket& ServerSession::socket()
 void ServerSession::destroy()
 {
     boost::system::error_code ec;
-    out_socket.close();
-    in_ssl_socket.next_layer().close();
+    if (out_socket.is_open()) {
+        out_socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+        out_socket.close();
+    }
+    if (in_ssl_socket.is_open()) {
+        in_ssl_socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+        in_ssl_socket.next_layer().close();
+    }
     //  resolver.cancel();
     /*  if (out_socket.is_open()) {
         out_socket.cancel(ec);

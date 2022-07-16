@@ -27,4 +27,5 @@ private:
     boost::asio::signal_set signals;
     boost::asio::ip::tcp::acceptor acceptor_;
     boost::asio::ssl::context ssl_context_;
+    std::shared_ptr<ServerSession> new_connection_;
 };
