@@ -204,33 +204,7 @@ void ServerSession::destroy()
             in_ssl_socket.next_layer().cancel(ec);
             in_ssl_socket.next_layer().shutdown(tcp::socket::shutdown_both, ec);
             in_ssl_socket.next_layer().close(ec);
-        })
-        // in_ssl_socket.next_layer().shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
-        // in_ssl_socket.next_layer().close();
-    }
-    //  resolver.cancel();
-    /*  if (out_socket.is_open()) {
-        out_socket.cancel(ec);
-        out_socket.shutdown(tcp::socket::shutdown_both, ec);
-        out_socket.close(ec);
+        });
     }
 
-    if (in_ssl_socket.next_layer().is_open()) {
-        auto self = shared_from_this();
-        auto ssl_shutdown_cb = [this, self](const boost::system::error_code error) {
-            if (error == boost::asio::error::operation_aborted) {
-                return;
-            }
-            boost::system::error_code ec;
-            //ssl_shutdown_timer.cancel();
-            in_ssl_socket.next_layer().cancel(ec);
-            in_ssl_socket.next_layer().shutdown(tcp::socket::shutdown_both, ec);
-            in_ssl_socket.next_layer().close(ec);
-        };
-        in_ssl_socket.next_layer().cancel(ec);
-        in_ssl_socket.async_shutdown(ssl_shutdown_cb);
-        // ssl_shutdown_timer.expires_after(chrono::seconds(SSL_SHUTDOWN_TIMEOUT));
-        //ssl_shutdown_timer.async_wait(ssl_shutdown_cb);
-    }
-    */
 }
