@@ -8,7 +8,8 @@ COPY build/overplus /usr/local/bin/overplus
 
 RUN apt-get update && apt-get -y --no-install-recommends install \
     build-essential \
-    libssl-dev 
+    libssl-dev \
+    wget
 
 # Let us add some heavy dependency
 RUN cd ${HOME} && \
