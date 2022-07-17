@@ -8,7 +8,7 @@
     ],
     "log_level": "DEBUG",
     "ssl": {
-        "cert": "/path/to/certificate.crt",
-        "key": "/path/to/private.key"
+        "cert": "/etc/overplus/cert.crt",
+        "key": "/etc/overplus/cert.key"
     }
 }

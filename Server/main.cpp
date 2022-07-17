@@ -5,9 +5,14 @@
 #include "Shared/LogFile.h"
 #include <string>
 
-int main()
+int main(int argc, char* argv[])
 {
-    ConfigManage::instance().load_config("server.json", ConfigManage::Server);
+    if(argc<2)
+    {
+        std::cerr << "Usage: " << argv[0] << "config path" << std::endl;
+        return 0;
+    }
+    ConfigManage::instance().load_config(argv[1], ConfigManage::Server);
     LogFile logfile_("server", 10 * 1024 * 1024);
     logger::set_log_level(ConfigManage::instance().server_cfg.log_level);
      logger::set_log_destination(Destination::D_FILE);

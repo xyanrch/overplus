@@ -20,6 +20,9 @@ build: gen_cmake
          bash -c \
         "cd build && \
          make " 
+build_image:
+	docker build ${DOCKER_DEPS_IMAGE_BUILD_FLAGS} -t yanrongdocker/overplus_docker:latest\
+      -f ./Dockerfile .
 
 build-docker-deps-image:
 	docker build ${DOCKER_DEPS_IMAGE_BUILD_FLAGS} -t yanrongdocker/overplus_build_base:latest \
