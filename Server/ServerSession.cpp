@@ -96,6 +96,7 @@ void ServerSession::do_connect(tcp::resolver::iterator& it)
                                 ERROR_LOG << "closing session. Client socket write error" << ec.message();
                                 // Most probably client closed socket. Let's close both sockets and exit session.
                                 destroy();
+                                return;
                             }
                         });
                 }
@@ -125,6 +126,7 @@ void ServerSession::in_async_read(int direction)
                     ERROR_LOG << "closing session. Client socket read error" << ec.message();
                     // Most probably client closed socket. Let's close both sockets and exit session.
                     destroy();
+                    return;
                     // context_.stop();
                 }
             });
@@ -142,6 +144,7 @@ void ServerSession::in_async_read(int direction)
                     ERROR_LOG << "closing session. Remote socket read error" << ec.message();
                     // Most probably remote server closed socket. Let's close both sockets and exit session.
                     destroy();
+                    return;
                     // context_.stop();
                 }
             });
@@ -160,6 +163,7 @@ void ServerSession::out_async_write(int direction, size_t len)
                     ERROR_LOG << "closing session. Client socket write error" << ec.message();
                     // Most probably client closed socket. Let's close both sockets and exit session.
                     destroy();
+                    return;
                 }
             });
         break;
@@ -172,6 +176,7 @@ void ServerSession::out_async_write(int direction, size_t len)
                     ERROR_LOG << "closing session. Remote socket write error", ec.message();
                     // Most probably remote server closed socket. Let's close both sockets and exit session.
                     destroy();
+                    return;
                 }
             });
         break;
@@ -184,13 +189,24 @@ boost::asio::ip::tcp::socket& ServerSession::socket()
 void ServerSession::destroy()
 {
     boost::system::error_code ec;
+    resolver_.cancel();
     if (out_socket.is_open()) {
+        out_socket.cancel(ec);
         out_socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
         out_socket.close();
     }
     if (in_ssl_socket.next_layer().is_open()) {
-        in_ssl_socket.next_layer().shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
-        in_ssl_socket.next_layer().close();
+        in_socket.next_layer().cancel(ec);
+        auto self = shared_from_this();
+        in_ssl_socket.async_shutdown([this, self]() {
+            boost::system::error_code ec;
+            // ssl_shutdown_timer.cancel();
+            in_ssl_socket.next_layer().cancel(ec);
+            in_ssl_socket.next_layer().shutdown(tcp::socket::shutdown_both, ec);
+            in_ssl_socket.next_layer().close(ec);
+        })
+        // in_ssl_socket.next_layer().shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+        // in_ssl_socket.next_layer().close();
     }
     //  resolver.cancel();
     /*  if (out_socket.is_open()) {

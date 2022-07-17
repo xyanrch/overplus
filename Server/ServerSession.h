@@ -19,11 +19,15 @@ class ServerSession : public std::enable_shared_from_this<ServerSession>
 
 public:
     ServerSession(boost::asio::io_context&, boost::asio::ssl::context&);
+    ~ServerSession()
+    {
+        destroy();
+    }
 
     void start();
     void do_read();
     boost::asio::ip::tcp::socket& socket();
-    //void handle_sock5();
+    // void handle_sock5();
     void in_async_read(int direction);
     void handle_trojan_handshake();
     void do_resolve();
@@ -34,10 +38,10 @@ public:
 
 private:
     static constexpr size_t MAX_BUFF_SIZE = 8192;
-    //SSLSocket ssl_socket;
+    // SSLSocket ssl_socket;
     boost::asio::io_context& io_context_;
     SSLSocket in_ssl_socket;
-    //tcp::socket in_socket;
+    // tcp::socket in_socket;
     tcp::socket out_socket;
     //
     std::string remote_host;
@@ -49,5 +53,5 @@ private:
     std::vector<char> out_buf;
     State state_ { HANDSHAKE };
     TrojanReq req {};
-    //unsigned char temp[4096] {};
+    // unsigned char temp[4096] {};
 };
