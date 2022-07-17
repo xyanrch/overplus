@@ -12,6 +12,7 @@ ServerSession::ServerSession(boost::asio::io_context& ioctx, boost::asio::ssl::c
     , resolver_(ioctx)
     , in_buf(MAX_BUFF_SIZE)
     , out_buf(MAX_BUFF_SIZE)
+    , ssl_shutdown_timer(ioctx)
 
 {
 }
@@ -196,15 +197,20 @@ void ServerSession::destroy()
         out_socket.close();
     }
     if (in_ssl_socket.next_layer().is_open()) {
-        in_socket.next_layer().cancel(ec);
         auto self = shared_from_this();
-        in_ssl_socket.async_shutdown([this, self]() {
+        auto ssl_shutdown_cb = [this, self](const boost::system::error_code error) {
+            if (error == boost::asio::error::operation_aborted) {
+                return;
+            }
             boost::system::error_code ec;
-            // ssl_shutdown_timer.cancel();
+            ssl_shutdown_timer.cancel();
             in_ssl_socket.next_layer().cancel(ec);
             in_ssl_socket.next_layer().shutdown(tcp::socket::shutdown_both, ec);
             in_ssl_socket.next_layer().close(ec);
-        });
+        };
+        in_ssl_socket.next_layer().cancel(ec);
+        in_ssl_socket.async_shutdown(ssl_shutdown_cb);
+        ssl_shutdown_timer.expires_after(chrono::seconds(SSL_SHUTDOWN_TIMEOUT));
+        ssl_shutdown_timer.async_wait(ssl_shutdown_cb);
     }
-
 }

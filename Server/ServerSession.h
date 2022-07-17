@@ -38,6 +38,7 @@ public:
 
 private:
     static constexpr size_t MAX_BUFF_SIZE = 8192;
+    static constexpr int SSL_SHUTDOWN_TIMEOUT = 10;
     // SSLSocket ssl_socket;
     boost::asio::io_context& io_context_;
     SSLSocket in_ssl_socket;
@@ -53,5 +54,7 @@ private:
     std::vector<char> out_buf;
     State state_ { HANDSHAKE };
     TrojanReq req {};
+
+    boost::asio::steady_timer ssl_shutdown_timer;
     // unsigned char temp[4096] {};
 };
