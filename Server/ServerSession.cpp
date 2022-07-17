@@ -1,6 +1,7 @@
 #include "ServerSession.h"
 #include "Shared/ConfigManage.h"
 #include "Shared/Log.h"
+#include <chrono>
 #include <cstring>
 #include <string>
 
@@ -210,7 +211,7 @@ void ServerSession::destroy()
         };
         in_ssl_socket.next_layer().cancel(ec);
         in_ssl_socket.async_shutdown(ssl_shutdown_cb);
-        ssl_shutdown_timer.expires_after(chrono::seconds(SSL_SHUTDOWN_TIMEOUT));
+        ssl_shutdown_timer.expires_after(std::chrono::seconds(SSL_SHUTDOWN_TIMEOUT));
         ssl_shutdown_timer.async_wait(ssl_shutdown_cb);
     }
 }
