@@ -40,7 +40,6 @@ public:
 
 private:
     static constexpr size_t MAX_BUFF_SIZE = 8192;
-    static constexpr int SSL_SHUTDOWN_TIMEOUT = 10;
     // SSLSocket ssl_socket;
     boost::asio::io_context& io_context_;
     SSLSocket in_ssl_socket;

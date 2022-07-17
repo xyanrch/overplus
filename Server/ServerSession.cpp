@@ -4,6 +4,7 @@
 #include <chrono>
 #include <cstring>
 #include <string>
+constexpr static int SSL_SHUTDOWN_TIMEOUT = 10;
 
 ServerSession::ServerSession(boost::asio::io_context& ioctx, boost::asio::ssl::context& sslctx)
 
