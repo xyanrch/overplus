@@ -80,6 +80,7 @@ void ServerSession::do_resolve()
 void ServerSession::do_connect(tcp::resolver::iterator& it)
 {
     auto self(shared_from_this());
+    state_ = FORWARD;
     out_socket.async_connect(*it,
         [this, self, it](const boost::system::error_code& ec) {
             if (!ec) {
@@ -191,6 +192,10 @@ boost::asio::ip::tcp::socket& ServerSession::socket()
 }
 void ServerSession::destroy()
 {
+    if (state_ == DESTROY) {
+        return;
+    }
+    state_ = DESTROY;
     boost::system::error_code ec;
     resolver_.cancel();
     if (out_socket.is_open()) {
