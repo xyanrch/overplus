@@ -204,19 +204,15 @@ void ServerSession::destroy()
         out_socket.close();
     }
     if (in_ssl_socket.next_layer().is_open()) {
-        auto ssl_shutdown_cb = [this, self = shared_from_this()](const boost::system::error_code error) {
+        in_ssl_socket.next_layer().cancel(ec);
+        in_ssl_socket.async_shutdown([this, self = shared_from_this()](const boost::system::error_code error) {
             if (error == boost::asio::error::operation_aborted) {
                 return;
             }
             boost::system::error_code ec;
-            ssl_shutdown_timer.cancel();
             in_ssl_socket.next_layer().cancel(ec);
             in_ssl_socket.next_layer().shutdown(tcp::socket::shutdown_both, ec);
             in_ssl_socket.next_layer().close(ec);
-        };
-        in_ssl_socket.next_layer().cancel(ec);
-        in_ssl_socket.async_shutdown(ssl_shutdown_cb);
-        ssl_shutdown_timer.expires_after(std::chrono::seconds(SSL_SHUTDOWN_TIMEOUT));
-        ssl_shutdown_timer.async_wait(ssl_shutdown_cb);
+        });
     }
 }
