@@ -65,7 +65,7 @@ void SslServer::do_accept()
             boost::system::error_code error;
             auto ep = new_connection_->socket().remote_endpoint(error);
             if (!error) {
-                NOTICE_LOG << "accept incoming connection :" << ep.address().to_string();
+                NOTICE_LOG << "accept incoming connection :" << ep.address().to_string()<<std::endl;
                 new_connection_->start();
 
             } else {

@@ -56,6 +56,7 @@ void logger::set_log_destination(Destination dest)
 logger::~logger()
 {
     //auto buf = impl.log_stream_.str();
+    impl.log_stream_<<"\n";
     output_(impl.log_stream_.str());
     if (impl.level_ == L_ERROR_EXIT) {
         flush_();
@@ -93,5 +94,5 @@ logger::Impl::Impl(Loglevel level)
 }
 logger::Impl::~Impl()
 {
-    log_stream_ << "\n";
+   // log_stream_ << "\n";
 }

@@ -199,8 +199,7 @@ void ServerSession::destroy()
         out_socket.close();
     }
     if (in_ssl_socket.next_layer().is_open()) {
-        auto self = shared_from_this();
-        auto ssl_shutdown_cb = [this, self](const boost::system::error_code error) {
+        auto ssl_shutdown_cb = [this, self = shared_from_this()](const boost::system::error_code error) {
             if (error == boost::asio::error::operation_aborted) {
                 return;
             }
