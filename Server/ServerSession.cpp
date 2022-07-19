@@ -127,7 +127,7 @@ void ServerSession::in_async_read(int direction)
                     out_async_write(1, length);
                 } else // if (ec != boost::asio::error::eof)
                 {
-                    ERROR_LOG << "closing session. Client socket read error" << ec.message();
+                    ERROR_LOG << "closing session. Client socket read error: " << ec.message();
                     // Most probably client closed socket. Let's close both sockets and exit session.
                     destroy();
                     return;
@@ -145,7 +145,7 @@ void ServerSession::in_async_read(int direction)
                     out_async_write(2, length);
                 } else // if (ec != boost::asio::error::eof)
                 {
-                    ERROR_LOG << "closing session. Remote socket read error" << ec.message();
+                    ERROR_LOG << "closing session. Remote socket read error: " << ec.message();
                     // Most probably remote server closed socket. Let's close both sockets and exit session.
                     destroy();
                     return;
@@ -203,16 +203,21 @@ void ServerSession::destroy()
         out_socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
         out_socket.close();
     }
-    if (in_ssl_socket.next_layer().is_open()) {
-        in_ssl_socket.next_layer().cancel(ec);
-        in_ssl_socket.async_shutdown([this, self = shared_from_this()](const boost::system::error_code error) {
+    if (in_ssl_socket.lowest_layer().is_open()) {
+        auto self = shared_from_this();
+        auto ssl_shutdown_cb = [this, self](const boost::system::error_code error) {
             if (error == boost::asio::error::operation_aborted) {
                 return;
             }
             boost::system::error_code ec;
-            in_ssl_socket.next_layer().cancel(ec);
-            in_ssl_socket.next_layer().shutdown(tcp::socket::shutdown_both, ec);
-            in_ssl_socket.next_layer().close(ec);
-        });
+            ssl_shutdown_timer.cancel();
+            // in_ssl_socket.lowest_layer().cancel(ec);
+            in_ssl_socket.lowest_layer().shutdown(tcp::socket::shutdown_both, ec);
+            in_ssl_socket.lowest_layer().close(ec);
+        };
+        in_ssl_socket.lowest_layer().cancel(ec);
+        in_ssl_socket.async_shutdown(ssl_shutdown_cb);
+        ssl_shutdown_timer.expires_after(std::chrono::seconds(SSL_SHUTDOWN_TIMEOUT));
+        ssl_shutdown_timer.async_wait(ssl_shutdown_cb);
     }
 }
