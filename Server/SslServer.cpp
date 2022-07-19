@@ -52,27 +52,36 @@ SslServer::SslServer()
 void SslServer::do_accept()
 {
     new_connection_.reset(new ServerSession(context_pool.get_io_context(), ssl_context_));
-    acceptor_.async_accept(new_connection_->socket(), [this,new_connection =new_connection_](const boost::system::error_code& ec) {
+    acceptor_.async_accept(new_connection_->socket(), [this](const boost::system::error_code& ec) {
+        auto clean_up = [this]() {
+            if (new_connection_->socket().is_open()) {
+                new_connection_->socket().close();
+            }
+        };
         if (!acceptor_.is_open()) {
             NOTICE_LOG << "Acceptor socket is not open, stop calling myself";
+            clean_up();
             return;
         }
         if (ec == boost::asio::error::operation_aborted) {
             NOTICE_LOG << "got cancel signal, stop calling myself";
+            clean_up();
             return;
         }
         if (!ec) {
             boost::system::error_code error;
-            auto ep = new_connection->socket().remote_endpoint(error);
+            auto ep = new_connection_->socket().remote_endpoint(error);
             if (!error) {
                 NOTICE_LOG << "accept incoming connection :" << ep.address().to_string();
-                new_connection->start();
+                new_connection_->start();
 
             } else {
                 NOTICE_LOG << "get remote point error :" << error.message();
+                clean_up();
             }
         } else {
             NOTICE_LOG << "accept incoming connection fail:" << ec.message() << std::endl;
+            clean_up();
         }
 
         do_accept();
