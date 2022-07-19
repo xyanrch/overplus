@@ -1,6 +1,7 @@
 #include "Log.h"
 #include <ctime>
 #include <ostream>
+#include <thread>
 #define ANSI_COLOR_RED "\x1b[31m"
 #define ANSI_COLOR_GREEN "\x1b[32m"
 #define ANSI_COLOR_YELLOW "\x1b[33m"
@@ -55,12 +56,12 @@ void logger::set_log_destination(Destination dest)
 }
 logger::~logger()
 {
-    //auto buf = impl.log_stream_.str();
-    impl.log_stream_<<"\n";
+    // auto buf = impl.log_stream_.str();
+    impl.log_stream_ << "\n";
     output_(impl.log_stream_.str());
     if (impl.level_ == L_ERROR_EXIT) {
         flush_();
-        //abort();
+        // abort();
     }
 }
 logger::logger(const char* file, const char* func, int line, Loglevel level)
@@ -78,6 +79,7 @@ logger::Impl::Impl(const char* file, const char* func, int line, Loglevel level)
     } else {
         log_stream_ << get_format_time() << level_str[level] << file << " " << func << ": line: " << line << " ";
     }
+    log_stream_ << "[" << std::this_thread::get_id() << "] ";
 
     level_ = level;
 }
@@ -90,9 +92,10 @@ logger::Impl::Impl(Loglevel level)
     } else {
         log_stream_ << get_format_time() << level_str[level] << " ";
     }
+    log_stream_ << "[" << std::this_thread::get_id() << "] ";
     level_ = level;
 }
 logger::Impl::~Impl()
 {
-   // log_stream_ << "\n";
+    // log_stream_ << "\n";
 }
