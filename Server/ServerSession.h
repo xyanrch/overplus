@@ -22,10 +22,6 @@ class ServerSession : public std::enable_shared_from_this<ServerSession>
 
 public:
     ServerSession(boost::asio::io_context&, boost::asio::ssl::context&);
-    ~ServerSession()
-    {
-        destroy();
-    }
 
     void start();
     void do_read();
