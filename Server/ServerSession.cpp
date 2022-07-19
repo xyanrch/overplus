@@ -208,19 +208,27 @@ void ServerSession::destroy()
         auto self = shared_from_this();
         in_ssl_socket.lowest_layer().cancel(ec);
         ssl_shutdown_timer.expires_after(std::chrono::seconds(SSL_SHUTDOWN_TIMEOUT));
+        in_ssl_socket.async_shutdown([this, self](const boost::system::error_code error) {
+            if (error == boost::asio::error::operation_aborted) {
+                return;
+            }
 
+            boost::system::error_code ec;
+            ssl_shutdown_timer.cancel();
+            in_ssl_socket.lowest_layer().cancel(ec);
+            in_ssl_socket.lowest_layer().shutdown(tcp::socket::shutdown_both, ec);
+            in_ssl_socket.lowest_layer().close(ec);
+        });
         ssl_shutdown_timer.async_wait([this, self](const boost::system::error_code error) {
             if (error == boost::asio::error::operation_aborted) {
                 return;
             }
             if (in_ssl_socket.lowest_layer().is_open()) {
                 boost::system::error_code ec;
-                // ssl_shutdown_timer.cancel();
-                // in_ssl_socket.lowest_layer().cancel(ec);
+                in_ssl_socket.lowest_layer().cancel(ec);
                 in_ssl_socket.lowest_layer().shutdown(tcp::socket::shutdown_both, ec);
                 in_ssl_socket.lowest_layer().close(ec);
             }
         });
-        in_ssl_socket.shutdown();
     }
 }
