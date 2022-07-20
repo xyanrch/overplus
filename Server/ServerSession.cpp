@@ -4,7 +4,7 @@
 #include <chrono>
 #include <cstring>
 #include <string>
-constexpr static int SSL_SHUTDOWN_TIMEOUT = 2;
+constexpr static int SSL_SHUTDOWN_TIMEOUT = 20;
 
 ServerSession::ServerSession(boost::asio::io_context& ioctx, boost::asio::ssl::context& sslctx)
 
@@ -200,22 +200,18 @@ void ServerSession::destroy()
     boost::system::error_code ec;
     resolver_.cancel();
     if (out_socket.is_open()) {
-        out_socket.cancel(ec);
         out_socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
         out_socket.close();
     }
     if (in_ssl_socket.lowest_layer().is_open()) {
         auto self = shared_from_this();
-        in_ssl_socket.lowest_layer().cancel(ec);
         ssl_shutdown_timer.expires_after(std::chrono::seconds(SSL_SHUTDOWN_TIMEOUT));
         in_ssl_socket.async_shutdown([this, self](const boost::system::error_code error) {
             if (error == boost::asio::error::operation_aborted) {
                 return;
             }
-
             boost::system::error_code ec;
             ssl_shutdown_timer.cancel();
-            in_ssl_socket.lowest_layer().cancel(ec);
             in_ssl_socket.lowest_layer().shutdown(tcp::socket::shutdown_both, ec);
             in_ssl_socket.lowest_layer().close(ec);
         });
@@ -223,12 +219,10 @@ void ServerSession::destroy()
             if (error == boost::asio::error::operation_aborted) {
                 return;
             }
-            if (in_ssl_socket.lowest_layer().is_open()) {
-                boost::system::error_code ec;
-                in_ssl_socket.lowest_layer().cancel(ec);
-                in_ssl_socket.lowest_layer().shutdown(tcp::socket::shutdown_both, ec);
-                in_ssl_socket.lowest_layer().close(ec);
-            }
+            boost::system::error_code ec;
+            in_ssl_socket.lowest_layer().cancel(ec);
+            in_ssl_socket.lowest_layer().shutdown(tcp::socket::shutdown_both, ec);
+            in_ssl_socket.lowest_layer().close(ec);
         });
     }
 }
