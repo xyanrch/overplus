@@ -165,6 +165,7 @@ void ServerSession::in_async_read(int direction)
     if (direction & 0x2)
         out_socket.async_read_some(boost::asio::buffer(out_buf),
             [this, self](boost::system::error_code ec, std::size_t length) {
+                deadline_timer_.cancel();
                 if (!ec) {
 
                     DEBUG_LOG << "<-- " << std::to_string(length) << " bytes";
