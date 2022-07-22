@@ -219,7 +219,6 @@ void ServerSession::destroy()
                 return;
             }
             boost::system::error_code ec;
-            ssl_shutdown_timer.cancel();
             in_ssl_socket.lowest_layer().shutdown(tcp::socket::shutdown_both, ec);
             in_ssl_socket.lowest_layer().cancel(ec);
             in_ssl_socket.lowest_layer().close(ec);
