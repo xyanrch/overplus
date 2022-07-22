@@ -15,34 +15,13 @@ ServerSession::ServerSession(boost::asio::io_context& ioctx, boost::asio::ssl::c
     , in_buf(MAX_BUFF_SIZE)
     , out_buf(MAX_BUFF_SIZE)
     , ssl_shutdown_timer(ioctx)
-    , deadline_timer_(ioctx)
 
 {
-}
-void ServerSession::start_deadline_timer()
-{
-    auto self = shared_from_this();
-
-    deadline_timer_.async_wait([this, self](const boost::system::error_code& error) {
-        if (state_ == DESTROY)
-            return;
-
-        // Check whether the deadline has passed. We compare the deadline against
-        // the current time since a new asynchronous operation may have moved the
-        // deadline before this actor had a chance to run.
-        if (deadline_timer_.expires_at() <= boost::asio::deadline_timer::traits_type::now()) {
-
-            destroy();
-        }
-    });
-    deadline_timer_.expires_from_now(boost::posix_time::seconds(DEADLINE_TIMEOUT));
 }
 void ServerSession::start()
 {
     auto self = shared_from_this();
-    start_deadline_timer();
     in_ssl_socket.async_handshake(boost::asio::ssl::stream_base::server, [this, self](const boost::system::error_code& error) {
-        deadline_timer_.cancel();
         if (error) {
             ERROR_LOG << "SSL handshake failed: " << error.message();
             destroy();
@@ -57,10 +36,8 @@ void ServerSession::handle_trojan_handshake()
     auto self = shared_from_this();
     // in_ssl_socket.next_layer().read_some(boost::asio::buffer)read_some()
     //  char temp[4096];
-    start_deadline_timer();
     in_ssl_socket.async_read_some(boost::asio::buffer(in_buf),
         [this, self](boost::system::error_code ec, std::size_t length) {
-            deadline_timer_.cancel();
             if (ec) {
                 // Log::log_with_endpoint(in_endpoint, "SSL handshake failed: " + error.message(), Log::ERROR);
                 destroy();
@@ -86,11 +63,9 @@ void ServerSession::handle_trojan_handshake()
 void ServerSession::do_resolve()
 {
     auto self(shared_from_this());
-    start_deadline_timer();
 
     resolver_.async_resolve(tcp::resolver::query(req.address.address, std::to_string(req.address.port)),
         [this, self](const boost::system::error_code& ec, tcp::resolver::iterator it) {
-            deadline_timer_.cancel();
             if (!ec) {
                 do_connect(it);
             } else {
@@ -104,10 +79,8 @@ void ServerSession::do_connect(tcp::resolver::iterator& it)
 {
     auto self(shared_from_this());
     state_ = FORWARD;
-    start_deadline_timer();
     out_socket.async_connect(*it,
         [this, self, it](const boost::system::error_code& ec) {
-            deadline_timer_.cancel();
             if (!ec) {
                 DEBUG_LOG << "connected to " << req.address.address << ":" << req.address.port;
                 // write_socks5_response();
@@ -224,7 +197,6 @@ void ServerSession::destroy()
 
     boost::system::error_code ec;
     resolver_.cancel();
-    deadline_timer_.cancel();
     if (out_socket.is_open()) {
         out_socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
         out_socket.cancel();

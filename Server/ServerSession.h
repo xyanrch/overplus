@@ -34,7 +34,6 @@ public:
     void out_async_write(int, size_t);
 
     void destroy();
-    void start_deadline_timer();
 
 private:
     static constexpr size_t MAX_BUFF_SIZE = 8192;
@@ -55,6 +54,5 @@ private:
     TrojanReq req {};
 
     boost::asio::steady_timer ssl_shutdown_timer;
-    boost::asio::deadline_timer deadline_timer_;
     // unsigned char temp[4096] {};
 };

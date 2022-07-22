@@ -73,6 +73,8 @@ void SslServer::do_accept()
             auto ep = new_connection_->socket().remote_endpoint(error);
             if (!error) {
                 NOTICE_LOG << "accept incoming connection :" << ep.address().to_string();
+                boost::asio::socket_base::keep_alive option(true);
+                new_connection_->socket().set_option(option);
                 new_connection_->start();
 
             } else {
