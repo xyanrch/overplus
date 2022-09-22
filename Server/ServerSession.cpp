@@ -214,6 +214,7 @@ void ServerSession::destroy()
             in_ssl_socket.lowest_layer().shutdown(tcp::socket::shutdown_both, ec);
             in_ssl_socket.lowest_layer().close(ec);
         });
+        ssl_shutdown_timer.expires_after(std::chrono::seconds(SSL_SHUTDOWN_TIMEOUT));
         ssl_shutdown_timer.async_wait([this, self](const boost::system::error_code error) {
             if (error == boost::asio::error::operation_aborted) {
                 return;
@@ -224,6 +225,6 @@ void ServerSession::destroy()
             in_ssl_socket.lowest_layer().cancel(ec);
             in_ssl_socket.lowest_layer().close(ec);
         });
-        ssl_shutdown_timer.expires_after(std::chrono::seconds(SSL_SHUTDOWN_TIMEOUT));
+        
     }
 }

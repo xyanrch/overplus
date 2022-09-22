@@ -4,6 +4,7 @@ set(CMAKE_CXX_STANDARD 17)
 #add_definitions(-Wall)
 #
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_BUILD_TYPE Debug)
 #set(Boost_USE_STATIC_LIBS on)
 include_directories(.)
 add_subdirectory(Shared)
