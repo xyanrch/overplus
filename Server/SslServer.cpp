@@ -102,9 +102,9 @@ void SslServer::add_signals()
     signals.add(SIGQUIT);
 #endif
     signals.async_wait([this](const boost::system::error_code& ec, int sig) {
-        acceptor_.close();
+        context_pool.stop();
 
         NOTICE_LOG << "Recieve signal:" << sig << " SslServer stopped..." << std::endl;
-        exit(1);
+
     });
 }
