@@ -4,8 +4,7 @@
 #include <chrono>
 #include <cstring>
 #include <string>
-constexpr static int SSL_SHUTDOWN_TIMEOUT = 20;
-constexpr static int DEADLINE_TIMEOUT = 60;
+constexpr static int SSL_SHUTDOWN_TIMEOUT = 30;
 ServerSession::ServerSession(boost::asio::io_context& ioctx, boost::asio::ssl::context& sslctx)
 
     : io_context_(ioctx)
@@ -82,6 +81,8 @@ void ServerSession::do_connect(tcp::resolver::iterator& it)
     out_socket.async_connect(*it,
         [this, self, it](const boost::system::error_code& ec) {
             if (!ec) {
+                boost::asio::socket_base::keep_alive option(true);
+                out_socket.set_option(option);
                 DEBUG_LOG << "connected to " << req.address.address << ":" << req.address.port;
                 // write_socks5_response();
                 // TODO
@@ -204,7 +205,7 @@ void ServerSession::destroy()
     }
     if (in_ssl_socket.lowest_layer().is_open()) {
         auto self = shared_from_this();
-
+        ssl_shutdown_timer.expires_after(std::chrono::seconds(SSL_SHUTDOWN_TIMEOUT));
         in_ssl_socket.async_shutdown([this, self](const boost::system::error_code error) {
             if (error == boost::asio::error::operation_aborted) {
                 return;
@@ -214,17 +215,14 @@ void ServerSession::destroy()
             in_ssl_socket.lowest_layer().shutdown(tcp::socket::shutdown_both, ec);
             in_ssl_socket.lowest_layer().close(ec);
         });
-        ssl_shutdown_timer.expires_after(std::chrono::seconds(SSL_SHUTDOWN_TIMEOUT));
         ssl_shutdown_timer.async_wait([this, self](const boost::system::error_code error) {
             if (error == boost::asio::error::operation_aborted) {
                 return;
             }
             boost::system::error_code ec;
-            ssl_shutdown_timer.cancel();
-            in_ssl_socket.lowest_layer().shutdown(tcp::socket::shutdown_both, ec);
             in_ssl_socket.lowest_layer().cancel(ec);
+            in_ssl_socket.lowest_layer().shutdown(tcp::socket::shutdown_both, ec);
             in_ssl_socket.lowest_layer().close(ec);
         });
-        
     }
 }
