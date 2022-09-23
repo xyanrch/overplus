@@ -126,7 +126,10 @@ void ServerSession::in_async_read(int direction)
                     out_async_write(1, length);
                 } else // if (ec != boost::asio::error::eof)
                 {
-                    ERROR_LOG << "closing session. Client socket read error: " << ec.message();
+                    if (ec != boost::asio::error::eof || ec != boost::asio::error::operation_aborted) {
+                        ERROR_LOG << "closing session. Client socket read error: " << ec.message();
+                    }
+
                     // Most probably client closed socket. Let's close both sockets and exit session.
                     destroy();
                     return;
@@ -144,7 +147,10 @@ void ServerSession::in_async_read(int direction)
                     out_async_write(2, length);
                 } else // if (ec != boost::asio::error::eof)
                 {
-                    ERROR_LOG << "closing session. Remote socket read error: " << ec.message();
+                    if (ec != boost::asio::error::eof || ec != boost::asio::error::operation_aborted) {
+                        ERROR_LOG << "closing session. Remote socket read error: " << ec.message();
+                    }
+
                     // Most probably remote server closed socket. Let's close both sockets and exit session.
                     destroy();
                     return;
@@ -163,7 +169,9 @@ void ServerSession::out_async_write(int direction, size_t len)
                 if (!ec)
                     in_async_read(direction);
                 else {
-                    ERROR_LOG << "closing session. Client socket write error" << ec.message();
+                    if (ec != boost::asio::error::operation_aborted) {
+                        ERROR_LOG << "closing session. Client socket write error" << ec.message();
+                    }
                     // Most probably client closed socket. Let's close both sockets and exit session.
                     destroy();
                     return;
@@ -176,7 +184,9 @@ void ServerSession::out_async_write(int direction, size_t len)
                 if (!ec)
                     in_async_read(direction);
                 else {
-                    ERROR_LOG << "closing session. Remote socket write error", ec.message();
+                    if (ec != boost::asio::error::operation_aborted) {
+                        ERROR_LOG << "closing session. Remote socket write error", ec.message();
+                    }
                     // Most probably remote server closed socket. Let's close both sockets and exit session.
                     destroy();
                     return;
