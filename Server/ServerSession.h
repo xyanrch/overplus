@@ -53,6 +53,6 @@ private:
     State state_ { HANDSHAKE };
     TrojanReq req {};
 
-    boost::asio::steady_timer ssl_shutdown_timer;
+    // boost::asio::steady_timer ssl_shutdown_timer;
     // unsigned char temp[4096] {};
 };

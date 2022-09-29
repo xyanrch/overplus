@@ -13,7 +13,7 @@ ServerSession::ServerSession(boost::asio::io_context& ioctx, boost::asio::ssl::c
     , resolver_(ioctx)
     , in_buf(MAX_BUFF_SIZE)
     , out_buf(MAX_BUFF_SIZE)
-    , ssl_shutdown_timer(ioctx)
+   // , ssl_shutdown_timer(ioctx)
 
 {
 }
@@ -214,25 +214,8 @@ void ServerSession::destroy()
         out_socket.close();
     }
     if (in_ssl_socket.lowest_layer().is_open()) {
-        auto self = shared_from_this();
-        ssl_shutdown_timer.expires_after(std::chrono::seconds(SSL_SHUTDOWN_TIMEOUT));
-        in_ssl_socket.async_shutdown([this, self](const boost::system::error_code error) {
-            if (error == boost::asio::error::operation_aborted) {
-                return;
-            }
-            boost::system::error_code ec;
-            ssl_shutdown_timer.cancel();
-            in_ssl_socket.lowest_layer().shutdown(tcp::socket::shutdown_both, ec);
-            in_ssl_socket.lowest_layer().close(ec);
-        });
-        ssl_shutdown_timer.async_wait([this, self](const boost::system::error_code error) {
-            if (error == boost::asio::error::operation_aborted) {
-                return;
-            }
-            boost::system::error_code ec;
-            in_ssl_socket.lowest_layer().cancel(ec);
-            in_ssl_socket.lowest_layer().shutdown(tcp::socket::shutdown_both, ec);
-            in_ssl_socket.lowest_layer().close(ec);
-        });
+     in_ssl_socket.lowest_layer().cancel(ec);
+        in_ssl_socket.lowest_layer().shutdown(tcp::socket::shutdown_both, ec);
+        in_ssl_socket.lowest_layer().close(ec);
     }
 }
