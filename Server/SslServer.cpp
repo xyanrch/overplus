@@ -13,41 +13,51 @@ SslServer::SslServer()
     , acceptor_(io_context)
     , ssl_context_(boost::asio::ssl::context::sslv23)
 {
-    auto& config_manage = ConfigManage::instance();
 
+    auto& config_manage = ConfigManage::instance();
     add_signals();
     ip::tcp::resolver resover(io_context);
     ip::tcp::endpoint endpoint = *resover.resolve(config_manage.server_cfg.local_addr, config_manage.server_cfg.local_port).begin();
-    //
-    ssl_context_.set_options(
-        boost::asio::ssl::context::default_workarounds
-        | boost::asio::ssl::context::no_sslv2
-        | boost::asio::ssl::context::single_dh_use);
-    // ssl_context_.set_password_callback([this](auto size, auto purpose) {
-    //    return "";
-    // });
-    ssl_context_.use_certificate_chain_file(config_manage.server_cfg.certificate_chain);
-    ssl_context_.use_private_key_file(config_manage.server_cfg.server_private_key, boost::asio::ssl::context::pem);
-    // ssl_context_.use_tmp_dh_file("dh512.pem");
-    //
-    //  ssl_context_.use_tmp_dh(boost::asio::const_buffer(g_dh2048_sz, g_dh2048_sz_size));
-
-    auto native_context = ssl_context_.native_handle();
-    SSL_CTX_set_session_cache_mode(native_context, SSL_SESS_CACHE_SERVER);
-
-    /*const char* config = "http/1.1";
-    SSL_CTX_set_alpn_select_cb(
-        native_context, [](SSL*, const unsigned char** out, unsigned char* outlen, const unsigned char* in, unsigned int inlen, void* config) -> int {
-            if (SSL_select_next_proto((unsigned char**)out, outlen, (unsigned char*)(config), std::strlen((const char*)config), in, inlen) != OPENSSL_NPN_NEGOTIATED) {
-                return SSL_TLSEXT_ERR_NOACK;
-            }
-            return SSL_TLSEXT_ERR_OK;
-        },
-        &config);*/
+    load_server_certificate(ssl_context_);
     acceptor_.open(endpoint.protocol());
     acceptor_.bind(endpoint);
     acceptor_.listen();
     do_accept();
+}
+void SslServer::load_server_certificate(boost::asio::ssl::context& ctx)
+{
+
+    /*
+        The certificate was generated from bash on Ubuntu (OpenSSL 1.1.1f) using:
+        openssl dhparam -out dh.pem 2048
+        openssl req -newkey rsa:2048 -nodes -keyout key.pem -x509 -days 10000 -out cert.pem -subj "/C=US/ST=CA/L=Los Angeles/O=Beast/CN=www.example.com"
+       std::string const dh = "-----BEGIN DH PARAMETERS-----\n"
+                             "MIIBCAKCAQEArzQc5mpm0Fs8yahDeySj31JZlwEphUdZ9StM2D8+Fo7TMduGtSi+\n"
+                             "/HRWVwHcTFAgrxVdm+dl474mOUqqaz4MpzIb6+6OVfWHbQJmXPepZKyu4LgUPvY/\n"
+                             "4q3/iDMjIS0fLOu/bLuObwU5ccZmDgfhmz1GanRlTQOiYRty3FiOATWZBRh6uv4u\n"
+                             "tff4A9Bm3V9tLx9S6djq31w31Gl7OQhryodW28kc16t9TvO1BzcV3HjRPwpe701X\n"
+                             "oEEZdnZWANkkpR/m/pfgdmGPU66S2sXMHgsliViQWpDCYeehrvFRHEdR9NV+XJfC\n"
+                             "QMUk26jPTIVTLfXmmwU0u8vUkpR7LQKkwwIBAg==\n"
+                             "-----END DH PARAMETERS-----\n";
+            // passphrase from the privatekey
+            ctx.set_password_callback(
+          [](std::size_t,
+              boost::asio::ssl::context_base::password_purpose) {
+              return "test";
+          });
+    // ctx.use_tmp_dh(
+    //   boost::asio::buffer(dh.data(), dh.size()));
+
+  */
+    auto& config_manage = ConfigManage::instance();
+
+    ctx.set_options(
+        boost::asio::ssl::context::default_workarounds
+        | boost::asio::ssl::context::no_sslv2);
+    // | boost::asio::ssl::context::single_dh_use);
+
+    ssl_context_.use_certificate_chain_file(config_manage.server_cfg.certificate_chain);
+    ssl_context_.use_private_key_file(config_manage.server_cfg.server_private_key, boost::asio::ssl::context::pem);
 }
 void SslServer::do_accept()
 {
@@ -102,9 +112,10 @@ void SslServer::add_signals()
     signals.add(SIGQUIT);
 #endif
     signals.async_wait([this](const boost::system::error_code& ec, int sig) {
-        context_pool.stop();
+        // context_pool.stop();
+        io_context.stop();
+        exit(1);
 
         NOTICE_LOG << "Recieve signal:" << sig << " SslServer stopped..." << std::endl;
-
     });
 }

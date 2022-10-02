@@ -18,6 +18,7 @@ public:
 private:
     void add_signals();
     void do_accept();
+    void load_server_certificate(boost::asio::ssl::context& ctx);
 
 private:
     IoContextPool context_pool;

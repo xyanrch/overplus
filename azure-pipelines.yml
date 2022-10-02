@@ -11,7 +11,6 @@ stages:
     steps:
     - script: |
         set -euo pipefail
-        echo 'target_link_libraries(overplus dl)' >> CMakeLists.txt
         cmake -DBoost_USE_STATIC_LIBS=ON .
         make
         strip -s overplus
