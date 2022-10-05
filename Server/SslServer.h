@@ -7,6 +7,7 @@
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/signal_set.hpp>
 #include <boost/asio/ssl/context.hpp>
+#include <cstdint>
 #include <memory>
 using namespace boost::asio;
 

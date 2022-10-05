@@ -12,6 +12,7 @@ SslServer::SslServer()
     , signals(io_context)
     , acceptor_(io_context)
     , ssl_context_(boost::asio::ssl::context::sslv23)
+  
 {
 
     auto& config_manage = ConfigManage::instance();
