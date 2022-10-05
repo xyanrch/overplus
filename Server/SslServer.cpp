@@ -12,7 +12,7 @@ SslServer::SslServer()
     , signals(io_context)
     , acceptor_(io_context)
     , ssl_context_(boost::asio::ssl::context::sslv23)
-  
+
 {
 
     auto& config_manage = ConfigManage::instance();
@@ -113,9 +113,7 @@ void SslServer::add_signals()
     signals.add(SIGQUIT);
 #endif
     signals.async_wait([this](const boost::system::error_code& ec, int sig) {
-        // context_pool.stop();
-        io_context.stop();
-        exit(1);
+        context_pool.stop();
 
         NOTICE_LOG << "Recieve signal:" << sig << " SslServer stopped..." << std::endl;
     });
