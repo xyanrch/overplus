@@ -1,0 +1,13 @@
+[Unit]
+Description=overplus - An proxy tool helps you bypass GFW
+After=network.target nss-lookup.target
+
+[Service]
+User=nobody
+ExecStart=/usr/bin/overplus  /etc/overplus/server.json
+Restart=on-failure
+RestartSec=10s
+LimitNOFILE=infinity
+
+[Install]
+WantedBy=multi-user.target
