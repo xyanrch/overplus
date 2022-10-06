@@ -73,6 +73,7 @@ void ServerConfig::populate(boost::property_tree::ptree& tree)
     } else {
         log_level = L_ERROR_EXIT;
     }
+    log_dir = tree.get("log_dir", std::string());
 
     certificate_chain = tree.get("ssl.cert", std::string());
     server_private_key = tree.get("ssl.key", std::string());

@@ -16,6 +16,7 @@ struct ServerConfig {
     ],
     #NOTICE DEBUG ERROR
     "log_level": "NOTICE",
+    "log_dir":"",
     "ssl": {
         "cert": "/path/to/certificate.crt",
         "key": "/path/to/private.key",
@@ -27,6 +28,7 @@ struct ServerConfig {
     std::unordered_set<std::string> allowed_passwords;
     //
     Loglevel log_level;
+    std::string log_dir;
     std::string certificate_chain;
     std::string server_private_key;
     //

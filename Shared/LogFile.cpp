@@ -43,7 +43,7 @@ LogFile::LogFile(const std::string& basename,
     , checkEveryN_(checkEveryN)
     , count_(0)
     , muti_threads(threadSafe)
-    //mutex_(threadSafe ? new MutexLock : NULL),
+    // mutex_(threadSafe ? new MutexLock : NULL),
     , startOfPeriod_(0)
     , lastRoll_(0)
     , lastFlush_(0)
