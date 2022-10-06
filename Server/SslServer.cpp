@@ -2,10 +2,10 @@
 #include "Server/ServerSession.h"
 #include "Shared/Log.h"
 #include <boost/asio/io_context.hpp>
-#include <boost/filesystem.hpp>
 #include <boost/system/error_code.hpp>
 #include <cstdlib>
 #include <cstring>
+#include <filesystem>
 #include <memory>
 #include <string>
 
@@ -67,10 +67,10 @@ static void dump_current_open_fd()
 {
 
     std::string path = "/proc/" + std::to_string(::getpid()) + "/fd/";
-    unsigned count = std::distance(boost::filesystem::directory_iterator(path),
-        boost::filesystem::directory_iterator());
+    unsigned count = std::distance(std::filesystem::directory_iterator(path),
+        std::filesystem::directory_iterator());
 
-    NOTICE_LOG<<"Current open fd count:"<<count;
+    NOTICE_LOG << "Current open fd count:" << count;
 }
 void SslServer::do_accept()
 {
@@ -95,7 +95,7 @@ void SslServer::do_accept()
             boost::system::error_code error;
             auto ep = new_connection_->socket().remote_endpoint(error);
             if (!error) {
-                DEBUG_LOG << "Current alive sessions:" << ServerSession::connection_num.load()<<"accept incoming connection :" << ep.address().to_string();
+                DEBUG_LOG << "Current alive sessions:" << ServerSession::connection_num.load() << "accept incoming connection :" << ep.address().to_string();
                 boost::asio::socket_base::keep_alive option(true);
                 new_connection_->socket().set_option(option);
                 new_connection_->start();
