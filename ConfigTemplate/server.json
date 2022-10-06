@@ -1,14 +1,13 @@
 {
     "run_type": "server",
     "local_addr": "0.0.0.0",
-    "local_port": "443",
+    "local_port": "VAR_PORT",
     "allowed_passwords": [
-        "password1",
-        "password2"
+        "VAR_PASSWORD"
     ],
-    "log_level": "DEBUG",
+    "log_level": "NOTICE",
     "ssl": {
-        "cert": "/etc/overplus/cert.crt",
-        "key": "/etc/overplus/cert.key"
+        "cert": "VAR_SERVER_CERT",
+        "key": "VAR_SERVER_KEY"
     }
 }

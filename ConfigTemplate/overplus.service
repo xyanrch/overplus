@@ -1,6 +1,6 @@
 [Unit]
 Description=overplus - An proxy tool helps you bypass GFW
-After=network.target nss-lookup.target
+After=network.target
 
 [Service]
 User=nobody
