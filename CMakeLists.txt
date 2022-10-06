@@ -19,7 +19,7 @@ find_package(Threads REQUIRED)
 ###generate server binary code
 find_package(OpenSSL REQUIRED)
 add_executable(overplus Server/main.cpp)
-target_link_libraries(overplus pthread  stdc++fs shared server proto OpenSSL::SSL)
+target_link_libraries(overplus pthread  shared server proto OpenSSL::SSL)
 target_include_directories(overplus PRIVATE ${Boost_INCLUDE_DIR})
 target_link_libraries(overplus ${Boost_LIBRARIES})
 ##generate client binary code

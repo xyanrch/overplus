@@ -5,7 +5,7 @@
 #include <boost/system/error_code.hpp>
 #include <cstdlib>
 #include <cstring>
-#include <filesystem>
+//#include <filesystem>
 #include <memory>
 #include <string>
 
@@ -67,10 +67,10 @@ static void dump_current_open_fd()
 {
 
     std::string path = "/proc/" + std::to_string(::getpid()) + "/fd/";
-    unsigned count = std::distance(std::filesystem::directory_iterator(path),
-        std::filesystem::directory_iterator());
+    // unsigned count = std::distance(std::filesystem::directory_iterator(path),
+    //    std::filesystem::directory_iterator());
 
-    NOTICE_LOG << "Current open fd count:" << count;
+    //  NOTICE_LOG << "Current open fd count:" << count;
 }
 void SslServer::do_accept()
 {
