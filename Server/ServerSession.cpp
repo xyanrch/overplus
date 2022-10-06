@@ -22,8 +22,8 @@
 #include <cstring>
 #include <string>
 
-constexpr static int SSL_SHUTDOWN_TIMEOUT= 30;
- std::atomic<uint32_t>ServerSession::connection_num(0);
+constexpr static int SSL_SHUTDOWN_TIMEOUT = 30;
+std::atomic<uint32_t> ServerSession::connection_num(0);
 ServerSession::ServerSession(boost::asio::io_context& ioctx, boost::asio::ssl::context& sslctx)
 
     : io_context_(ioctx)
@@ -39,15 +39,15 @@ ServerSession::ServerSession(boost::asio::io_context& ioctx, boost::asio::ssl::c
 }
 ServerSession::~ServerSession()
 {
-  connection_num--;
-  NOTICE_LOG<<"Session dectructed, current alive session:"<<connection_num.load();
+    connection_num--;
+    DEBUG_LOG << "Session dectructed, current alive session:" << connection_num.load();
 }
 void ServerSession::start()
 {
     auto self = shared_from_this();
     upstream_ssl_socket.async_handshake(boost::asio::ssl::stream_base::server, [this, self](const boost::system::error_code& error) {
         if (error) {
-            ERROR_LOG << "SSL handshake failed: " << error.message();
+            ERROR_LOG << "Current alive sessions:" << connection_num.load() << "SSL handshake failed: " << error.message();
             destroy();
             return;
         }
@@ -63,6 +63,7 @@ void ServerSession::handle_trojan_handshake()
     upstream_ssl_socket.async_read_some(boost::asio::buffer(in_buf),
         [this, self](boost::system::error_code ec, std::size_t length) {
             if (ec) {
+                NOTICE_LOG << "Current alive sessions:" << connection_num.load() << "Read trojan message failed:" << ec.message();
                 // Log::log_with_endpoint(in_endpoint, "SSL handshake failed: " + error.message(), Log::ERROR);
                 destroy();
                 return;
@@ -71,7 +72,7 @@ void ServerSession::handle_trojan_handshake()
             if (valid) {
                 //
                 if (!ConfigManage::instance().server_cfg.allowed_passwords.count(req.password)) {
-                    ERROR_LOG << "unspoorted password from client....,end session";
+                    ERROR_LOG << "Current alive sessions:" << connection_num.load() << "unspoorted password from client....,end session";
                     destroy();
                     return;
                 }
@@ -93,7 +94,7 @@ void ServerSession::do_resolve()
             if (!ec) {
                 do_connect(it);
             } else {
-                ERROR_LOG << "failed to resolve " << remote_host << ":" << remote_port << " " << ec.message();
+                ERROR_LOG << "Current alive sessions:" << connection_num.load() << "failed to resolve " << remote_host << ":" << remote_port << " " << ec.message();
                 destroy();
             }
         });
@@ -121,7 +122,7 @@ void ServerSession::do_connect(tcp::resolver::iterator& it)
                             if (!ec)
                                 async_bidirectional_read(3);
                             else {
-                                ERROR_LOG << "closing session. Client socket write error" << ec.message();
+                                ERROR_LOG << "Current alive sessions:" << connection_num.load() << "closing session. Client socket write error" << ec.message();
                                 // Most probably client closed socket. Let's close both sockets and exit session.
                                 destroy();
                                 return;
@@ -133,7 +134,7 @@ void ServerSession::do_connect(tcp::resolver::iterator& it)
                     async_bidirectional_read(3);
 
             } else {
-                ERROR_LOG << "failed to connect " << remote_host << ":" << remote_port << " " << ec.message();
+                ERROR_LOG << "Current alive sessions:" << connection_num.load() << "failed to connect " << remote_host << ":" << remote_port << " " << ec.message();
                 destroy();
             }
         });
@@ -152,7 +153,7 @@ void ServerSession::async_bidirectional_read(int direction)
                 } else // if (ec != boost::asio::error::eof)
                 {
                     if (ec != boost::asio::error::eof && ec != boost::asio::error::operation_aborted) {
-                        ERROR_LOG << "closing session. Client socket read error: " << ec.message();
+                        ERROR_LOG << "Current alive sessions:" << connection_num.load() << "closing session. Client socket read error: " << ec.message();
                     }
 
                     // Most probably client closed socket. Let's close both sockets and exit session.
@@ -172,7 +173,7 @@ void ServerSession::async_bidirectional_read(int direction)
                 } else // if (ec != boost::asio::error::eof)
                 {
                     if (ec != boost::asio::error::eof && ec != boost::asio::error::operation_aborted) {
-                        ERROR_LOG << "closing session. Remote socket read error: " << ec.message();
+                        ERROR_LOG << "Current alive sessions:" << connection_num.load() << "closing session. Remote socket read error: " << ec.message();
                     }
 
                     // Most probably remote server closed socket. Let's close both sockets and exit session.
@@ -193,7 +194,7 @@ void ServerSession::async_bidirectional_write(int direction, size_t len)
                     async_bidirectional_read(direction);
                 else {
                     if (ec != boost::asio::error::operation_aborted) {
-                        ERROR_LOG << "closing session. Client socket write error" << ec.message();
+                        ERROR_LOG << "Current alive sessions:" << connection_num.load() << "closing session. Client socket write error" << ec.message();
                     }
                     // Most probably client closed socket. Let's close both sockets and exit session.
                     destroy();
@@ -208,7 +209,7 @@ void ServerSession::async_bidirectional_write(int direction, size_t len)
                     async_bidirectional_read(direction);
                 else {
                     if (ec != boost::asio::error::operation_aborted) {
-                        ERROR_LOG << "closing session. Remote socket write error", ec.message();
+                        ERROR_LOG << "Current alive sessions:" << connection_num.load() << "closing session. Remote socket write error", ec.message();
                     }
                     // Most probably remote server closed socket. Let's close both sockets and exit session.
                     destroy();

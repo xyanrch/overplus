@@ -38,6 +38,9 @@ public:
 
     void destroy();
 
+public:
+    static std::atomic<uint32_t> connection_num;
+
 private:
     static constexpr size_t MAX_BUFF_SIZE = 8192;
     // SSLSocket ssl_socket;
@@ -58,6 +61,4 @@ private:
 
     // boost::asio::steady_timer ssl_shutdown_timer;
     // unsigned char temp[4096] {};
-
-    static std::atomic<uint32_t>connection_num;
 };

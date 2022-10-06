@@ -149,8 +149,8 @@ function install_overplus(){
     cp overplus/ConfigTemplate/overplus.service /etc/systemd/system/overplus.service
     
     cd
-    if [ -f overplus-0-3.zip ]; then
-        rm -rf overplus-0-3.zip
+    if [ -f LinuxRelease.zip ]; then
+        rm -rf LinuxRelease.zip
     fi
     if [ -d './LinuxRelease' ]; then
         rm -rf LinuxRelease
