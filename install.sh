@@ -3,6 +3,7 @@
 #SERVER_NAME=''
 #SERVER_CERT="/etc/overplus/$SERVER_NAME.crt"
 #SERVER_KEY="/etc/overplus/$SERVER_NAME.crt"
+VERSION="V1.0.1"
 blue(){
     echo -e "\033[34m\033[01m$1\033[0m"
 }
@@ -95,7 +96,8 @@ function install_overplus(){
         red "============================================================="
         exit 1
     fi
-    SOFTWARE_PACKAGE=https://github.com/xyanrch/overplus/releases/download/2.0/LinuxRelease.zip
+    
+    SOFTWARE_PACKAGE=https://github.com/xyanrch/overplus/releases/download/${VERSION}/LinuxRelease.zip
     #PORT_CHOICE=${PORT_CHOICE:-1}
     #PORT="443"
     
