@@ -63,7 +63,7 @@ void SslServer::load_server_certificate(boost::asio::ssl::context& ctx)
     ssl_context_.use_certificate_chain_file(config_manage.server_cfg.certificate_chain);
     ssl_context_.use_private_key_file(config_manage.server_cfg.server_private_key, boost::asio::ssl::context::pem);
 }
-static void dump_current_open_fd()
+/*static void dump_current_open_fd()
 {
 
     std::string path = "/proc/" + std::to_string(::getpid()) + "/fd/";
@@ -71,7 +71,7 @@ static void dump_current_open_fd()
     //    std::filesystem::directory_iterator());
 
     //  NOTICE_LOG << "Current open fd count:" << count;
-}
+}*/
 void SslServer::do_accept()
 {
     new_connection_.reset(new ServerSession(context_pool.get_io_context(), ssl_context_));
@@ -105,7 +105,7 @@ void SslServer::do_accept()
                 clean_up();
             }
         } else {
-            dump_current_open_fd();
+           // dump_current_open_fd();
             NOTICE_LOG << "Current alive sessions:" << ServerSession::connection_num.load() << "accept incoming connection fail:" << ec.message() << std::endl;
             clean_up();
         }
@@ -126,7 +126,7 @@ void SslServer::add_signals()
     signals.add(SIGQUIT);
 #endif
     signals.async_wait([this](const boost::system::error_code& ec, int sig) {
-        dump_current_open_fd();
+       // dump_current_open_fd();
         context_pool.stop();
 
         NOTICE_LOG << "Recieve signal:" << sig << " SslServer stopped..." << std::endl;
