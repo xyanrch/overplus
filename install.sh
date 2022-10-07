@@ -131,8 +131,8 @@ function install_overplus(){
     tar -xvf overplus-linux-amd64.tar.xz
     
     cp overplus/overplus /usr/bin/overplus
-    #cp overplus/ConfigTemplate/server.json /etc/overplus/server.json
-    cp /home/xx/overplus/ConfigTemplate/server.json /etc/overplus/server.json
+    cp overplus/ConfigTemplate/server.json /etc/overplus/server.json
+    #cp /home/xx/overplus/ConfigTemplate/server.json /etc/overplus/server.json
     
     NAME=$(cat /etc/overplus/easy-rsa/SERVER_NAME_GENERATED)
     SERVER_CERT="/etc/overplus/${NAME}.crt"
