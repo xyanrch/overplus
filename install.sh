@@ -95,7 +95,7 @@ function install_overplus(){
         red "============================================================="
         exit 1
     fi
-    SOFTWARE_PACKAGE=https://github.com/xyanrch/overplus/releases/download/0.3/overplus-0-3.zip
+    SOFTWARE_PACKAGE=https://github.com/xyanrch/overplus/releases/download/2.0/LinuxRelease.zip
     #PORT_CHOICE=${PORT_CHOICE:-1}
     #PORT="443"
     
@@ -126,7 +126,7 @@ function install_overplus(){
     generate_certifiate
     cd
     wget $SOFTWARE_PACKAGE
-    unzip  overplus-0-3.zip
+    unzip  LinuxRelease.zip
     cd LinuxRelease
     tar -xvf overplus-linux-amd64.tar.xz
     
