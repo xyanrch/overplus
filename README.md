@@ -1,5 +1,4 @@
 # overplus
-It is a proxy server that support trojan protocol.
 Overplus is another implement of trojan protocal with better perfermance and stability
 
 ## One-click deployment
