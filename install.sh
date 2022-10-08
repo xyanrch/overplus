@@ -128,7 +128,7 @@ function install_overplus(){
     generate_certifiate
     cd
     blue "download overplus package ..."
-    wget $SOFTWARE_PACKAGE 
+    wget $SOFTWARE_PACKAGE
     unzip  LinuxRelease.zip >/dev/null 2>&1
     cd LinuxRelease
     tar -xvf overplus-linux-amd64.tar.xz >/dev/null 2>&1
@@ -163,11 +163,13 @@ function install_overplus(){
     systemctl enable overplus.service
     
     green " ===================================="
-    green "Overplus has sucessfully installed "
-    
+    green "Overplus has sucessfully installed"
+    green "Please run \"systemctl status overplus.service\" to check service status"
+    green " ===================================="
     green "Your sever config is located :/etc/overplus/server.json"
     cat /etc/overplus/server.json
-    systemctl status overplus.service
+    
+    
     
 }
 function remove_overplus(){
