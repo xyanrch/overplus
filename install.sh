@@ -127,10 +127,11 @@ function install_overplus(){
     esac
     generate_certifiate
     cd
-    wget $SOFTWARE_PACKAGE
-    unzip  LinuxRelease.zip
+    blue "download overplus package ..."
+    wget $SOFTWARE_PACKAGE 
+    unzip  LinuxRelease.zip >/dev/null 2>&1
     cd LinuxRelease
-    tar -xvf overplus-linux-amd64.tar.xz
+    tar -xvf overplus-linux-amd64.tar.xz >/dev/null 2>&1
     
     cp overplus/overplus /usr/bin/overplus
     cp overplus/ConfigTemplate/server.json /etc/overplus/server.json
@@ -141,8 +142,6 @@ function install_overplus(){
     SERVER_KEY="/etc/overplus/${NAME}.key"
     sed -i "s/VAR_PORT/$PORT/" /etc/overplus/server.json
     sed -i "s/VAR_PASSWORD/$USER_PASSWORD/" /etc/overplus/server.json
-    echo $SERVER_CERT
-    echo $SERVER_KEY
     
     sed -i "s~VAR_SERVER_CERT~${SERVER_CERT}~" /etc/overplus/server.json
     sed -i "s~VAR_SERVER_KEY~$SERVER_KEY~" /etc/overplus/server.json
@@ -159,8 +158,16 @@ function install_overplus(){
     fi
     
     chmod 664 /etc/systemd/system/overplus.service
+    systemctl daemon-reload
     systemctl start overplus.service
     systemctl enable overplus.service
+    
+    green " ===================================="
+    green "Overplus has sucessfully installed "
+    
+    green "Your sever config is located :/etc/overplus/server.json"
+    cat /etc/overplus/server.json
+    systemctl status overplus.service
     
 }
 function remove_overplus(){
