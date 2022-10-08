@@ -1,5 +1,13 @@
 # overplus
-Overplus is another implement of trojan protocal with better perfermance and stability
+Overplus is another implement of trojan protocal with better perfermance and stability.
+
+Comapared to trojan:
+It don't need to setup a http server on port 80 in your linux server.
+It don't need to apply a domain name.
+More readable and cleaner code.
+
+
+
 
 ## One-click deployment
 Run the script and follow the assistant:
