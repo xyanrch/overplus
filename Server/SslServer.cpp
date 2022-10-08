@@ -24,6 +24,7 @@ SslServer::SslServer()
     ip::tcp::endpoint endpoint = *resover.resolve(config_manage.server_cfg.local_addr, config_manage.server_cfg.local_port).begin();
     load_server_certificate(ssl_context_);
     acceptor_.open(endpoint.protocol());
+    acceptor_.set_option(tcp::acceptor::reuse_address(true));
     acceptor_.bind(endpoint);
     acceptor_.listen();
     do_accept();
@@ -105,7 +106,7 @@ void SslServer::do_accept()
                 clean_up();
             }
         } else {
-           // dump_current_open_fd();
+            // dump_current_open_fd();
             NOTICE_LOG << "Current alive sessions:" << ServerSession::connection_num.load() << "accept incoming connection fail:" << ec.message() << std::endl;
             clean_up();
         }
@@ -126,7 +127,7 @@ void SslServer::add_signals()
     signals.add(SIGQUIT);
 #endif
     signals.async_wait([this](const boost::system::error_code& ec, int sig) {
-       // dump_current_open_fd();
+        // dump_current_open_fd();
         context_pool.stop();
 
         NOTICE_LOG << "Recieve signal:" << sig << " SslServer stopped..." << std::endl;
