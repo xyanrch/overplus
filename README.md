@@ -29,9 +29,27 @@ make
 ### how to run
 
 ``` 
-sudo ./overplus Server.json
+sudo ./overplus server.json
 ```
-Server.json is a config file which you can custom the config in.
+server.json is a config file which you can custom the config in.
+
+#### exmaple config file
+```
+{
+    "run_type": "server",
+    "local_addr": "0.0.0.0",
+    "local_port": "443",
+    "allowed_passwords": [
+        "testpsswd"
+    ],
+    "log_level": "NOTICE",
+    "log_dir":"",
+    "ssl": {
+        "cert": "path_to_cert",
+        "key": "path_to_key"
+    }
+}
+```
 
 
  ## Client side 
