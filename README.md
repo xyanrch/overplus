@@ -27,5 +27,5 @@ Server.json is a config file which you can custom the config in.
 
 
  ## Client side 
- Overplus fully support trojan protocol, So it is Ok to use trojan's client. Please make sure disable certificate verify if you use a self issued certificate.
+ Overplus fully support trojan protocol, So it is Ok to use trojan's client. Please make sure disable certificate verification if you use a self issued certificate.
 
