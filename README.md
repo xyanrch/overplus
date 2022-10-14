@@ -65,6 +65,6 @@ Trojan protocal is a socks5 like protocal.Trojan request is formed as follows:
  Overplus fully support trojan protocol, So it is Ok to use trojan's client. Please make sure disable certificate verification if you use a self issued certificate.
 
 
-## Plan
+## Roadmap
 - [ ] Implement a web console to manage overplus
 - [ ] Design a new protocal to replace trojan protocal
