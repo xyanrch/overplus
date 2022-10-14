@@ -1,0 +1,14 @@
+{
+    "run_type": "server",
+    "local_addr": "0.0.0.0",
+    "local_port": "VAR_PORT",
+    "allowed_passwords": [
+        "VAR_PASSWORD"
+    ],
+    "log_level": "NOTICE",
+    "log_dir":"",
+    "ssl": {
+        "cert": "VAR_SERVER_CERT",
+        "key": "VAR_SERVER_KEY"
+    }
+}

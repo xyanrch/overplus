@@ -1,0 +1,12 @@
+@startuml
+Client -> proxy_server: setup tcp connection
+Client -> proxy_server: TLS handshake (client hello)
+proxy_server --> Client: TLS handshake (server hello certificate key exchage)
+Client ->proxy_server:trojan request(password destination host)
+proxy_server -> remote_server: setup tcp connection with destination
+Client->proxy_server:upstream payload
+proxy_server->remote_server:upstream payload
+proxy_server<-remote_server:downstream payload
+Client<-proxy_server:downstream payload
+
+@enduml

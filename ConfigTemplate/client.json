@@ -1,0 +1,9 @@
+{
+  "run_type": "client",
+  "local_addr": "localhost",
+  "local_port": "1080",
+  "remote_addr": "1.2.3.4",
+  "remote_port": "443",
+  "user_name":"user1",
+  "password": "password1"
+}
