@@ -3,7 +3,7 @@ set(proto_SRCS
         socks5/socks5.cpp
         Coding.cpp
         TrojanReq.cpp
-        VplusProtocal/VRequest.cpp
+        VProtocal/VRequest.cpp
         )
 
 add_library(proto ${proto_SRCS})

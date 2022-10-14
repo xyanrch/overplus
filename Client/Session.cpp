@@ -2,7 +2,7 @@
 #include "Session.h"
 #include "Shared/ConfigManage.h"
 #include "Shared/Log.h"
-#include <Protocal/VplusProtocal/VRequest.h>
+#include <Protocal/VProtocal/VRequest.h>
 #include <Protocal/socks5/socks5.h>
 #include <boost/asio/buffer.hpp>
 #include <boost/asio/io_context.hpp>
