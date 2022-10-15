@@ -32,19 +32,7 @@ SslServer::SslServer()
 void SslServer::load_server_certificate(boost::asio::ssl::context& ctx)
 {
 
-    /*
-        The certificate was generated from bash on Ubuntu (OpenSSL 1.1.1f) using:
-        openssl dhparam -out dh.pem 2048
-        openssl trojanReq -newkey rsa:2048 -nodes -keyout key.pem -x509 -days 10000 -out cert.pem -subj "/C=US/ST=CA/L=Los Angeles/O=Beast/CN=www.example.com"
-       std::string const dh = "-----BEGIN DH PARAMETERS-----\n"
-                             "MIIBCAKCAQEArzQc5mpm0Fs8yahDeySj31JZlwEphUdZ9StM2D8+Fo7TMduGtSi+\n"
-                             "/HRWVwHcTFAgrxVdm+dl474mOUqqaz4MpzIb6+6OVfWHbQJmXPepZKyu4LgUPvY/\n"
-                             "4q3/iDMjIS0fLOu/bLuObwU5ccZmDgfhmz1GanRlTQOiYRty3FiOATWZBRh6uv4u\n"
-                             "tff4A9Bm3V9tLx9S6djq31w31Gl7OQhryodW28kc16t9TvO1BzcV3HjRPwpe701X\n"
-                             "oEEZdnZWANkkpR/m/pfgdmGPU66S2sXMHgsliViQWpDCYeehrvFRHEdR9NV+XJfC\n"
-                             "QMUk26jPTIVTLfXmmwU0u8vUkpR7LQKkwwIBAg==\n"
-                             "-----END DH PARAMETERS-----\n";
-            // passphrase from the privatekey
+    /*            // passphrase from the privatekey
             ctx.set_password_callback(
           [](std::size_t,
               boost::asio::ssl::context_base::password_purpose) {

@@ -32,7 +32,7 @@ public:
     boost::asio::ip::tcp::socket& socket();
     // void handle_sock5();
     void async_bidirectional_read(int direction);
-    void handle_trojan_handshake();
+    void handle_custom_protocol();
     void do_resolve();
     void do_connect(tcp::resolver::iterator&);
     void async_bidirectional_write(int, size_t);

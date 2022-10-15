@@ -51,10 +51,10 @@ void ServerSession::start()
             destroy();
             return;
         }
-        handle_trojan_handshake();
+        handle_custom_protocol();
     });
 }
-void ServerSession::handle_trojan_handshake()
+void ServerSession::handle_custom_protocol()
 {
     // trojan handshak
     auto self = shared_from_this();
