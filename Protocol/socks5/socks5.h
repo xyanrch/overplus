@@ -2,7 +2,6 @@
 // socks5 specification
 // https://www.rfc-editor.org/rfc/rfc1928
 
-
 #pragma once
 #include "../Coding.h"
 
@@ -66,13 +65,14 @@ public:
     enum CMD : uint8_t {
         CONNECT = 0x01,
         BIND = 0x02,
-        UPD_ASSOCIATE = 0x03
+        UDP_ASSOCIATE = 0x03
 
     };
 
+    static std::string command_to_string(CMD cmd);
 
 public:
-    bool unsteam(std::vector<char>& buf,int length);
+    bool unsteam(std::vector<char>& buf, int length);
 
 public:
     uint8_t version;
@@ -82,18 +82,19 @@ public:
     std::string remote_host;
     uint16_t remote_port;
 };
+std::ostream& operator<<(std::ostream& os, Request& req);
 
-class Reply{
+class Reply {
 public:
     void stream(std::string& buf)
     {
-        Coding::EncodeFixed8(buf,version);
-        Coding::EncodeFixed8(buf,repResult);
-        Coding::EncodeFixed8(buf,reserved);
+        Coding::EncodeFixed8(buf, version);
+        Coding::EncodeFixed8(buf, repResult);
+        Coding::EncodeFixed8(buf, reserved);
 
-        Coding::EncodeFixed8(buf,static_cast<uint8_t >(addrtype));
-        Coding::EncodeFixed32(buf,realRemoteIP);
-        Coding::EncodeFixed16(buf,realRemotePort);
+        Coding::EncodeFixed8(buf, static_cast<uint8_t>(addrtype));
+        Coding::EncodeFixed32(buf, realRemoteIP);
+        Coding::EncodeFixed16(buf, realRemotePort);
     }
 
 public:
@@ -103,7 +104,4 @@ public:
     ADDRTYPE addrtype;
     uint32_t realRemoteIP;
     uint16_t realRemotePort;
-
-
 };
-

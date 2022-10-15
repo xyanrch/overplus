@@ -120,3 +120,19 @@ bool Request::unsteam(std::vector<char>& buf, int length)
     }
     return true;
 }
+ std::string Request::command_to_string(CMD cmd)
+{
+    if (cmd == CONNECT)
+        return "CONNECT";
+    if (cmd == BIND)
+        return "BIND";
+    if (cmd == UDP_ASSOCIATE)
+        return "UDP_ASSOCIATE";
+    return "ERR";
+}
+std::ostream& operator<<(std::ostream& os, Request& req)
+{
+    os << "Request {VER:" << (int)req.version << ", command:" << Request::command_to_string(req.cmd)
+       << ", remote_host: " << req.remote_host << ", remote_port:" << req.remote_port << " }";
+    return os;
+}

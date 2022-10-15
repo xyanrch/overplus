@@ -90,7 +90,7 @@ void Session::read_socks5_request()
                     destroy();
                     return;
                 }
-                //  do_connec_to_proxy_server(trojanReq);
+                NOTICE_LOG<<"Receive socks5 message "<<req;
                 do_resolve(req);
             } else {
                 ERROR_LOG << "SOCKS5 request read:" << ec.message();
