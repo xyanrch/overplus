@@ -84,7 +84,7 @@ void SslServer::do_accept()
             boost::system::error_code error;
             auto ep = new_connection_->socket().remote_endpoint(error);
             if (!error) {
-                DEBUG_LOG << "Current alive sessions:" << ServerSession::connection_num.load() << "accept incoming connection :" << ep.address().to_string();
+                DEBUG_LOG << "Session_num:[" << ServerSession::connection_num.load() << "] accept incoming connection :" << ep.address().to_string();
                 boost::asio::socket_base::keep_alive option(true);
                 new_connection_->socket().set_option(option);
                 new_connection_->start();
@@ -95,7 +95,7 @@ void SslServer::do_accept()
             }
         } else {
             // dump_current_open_fd();
-            NOTICE_LOG << "Current alive sessions:" << ServerSession::connection_num.load() << "accept incoming connection fail:" << ec.message() << std::endl;
+            NOTICE_LOG << "Session_num:[" << ServerSession::connection_num.load() << "] accept incoming connection fail:" << ec.message() << std::endl;
             clean_up();
         }
 

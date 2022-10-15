@@ -14,7 +14,6 @@ Server::Server(const std::string& address, const std::string& port)
     ip::tcp::resolver resover(io_context);
     ip::tcp::endpoint endpoint = *resover.resolve(address, port).begin();
 
-
     acceptor_.open(endpoint.protocol());
     acceptor_.set_option(ip::tcp::acceptor::reuse_address(true));
     acceptor_.bind(endpoint);
@@ -23,7 +22,7 @@ Server::Server(const std::string& address, const std::string& port)
 }
 void Server::do_accept()
 {
-    std::shared_ptr<Session> new_session = std::make_shared<Session>(context_pool.get_io_context(),ssl_ctx);
+    std::shared_ptr<Session> new_session = std::make_shared<Session>(context_pool.get_io_context(), ssl_ctx);
     acceptor_.async_accept(new_session->socket(), [this, new_session](const boost::system::error_code& ec) {
         if (!acceptor_.is_open()) {
             return;
@@ -33,10 +32,12 @@ void Server::do_accept()
             return;
         }
         if (!ec) {
-            NOTICE_LOG << "accept incoming connection :" << ec.message() << std::endl;
+            boost::system::error_code error;
+            auto ep = new_session->socket().remote_endpoint(error);
+            NOTICE_LOG << "accept incoming connection :" << ep.address().to_string();
             new_session->start();
         } else {
-            NOTICE_LOG << "accept incoming connection fail:" << ec.message() << std::endl;
+            NOTICE_LOG << "accept incoming connection fail:" << ec.message();
         }
         do_accept();
     });
