@@ -32,7 +32,7 @@ make
 ``` 
 sudo ./overplus server.json
 ```
-server.json is a config file which you can custom the config in.
+server.json is a config file which you can customize.
 
 #### example config file
 ```
