@@ -61,7 +61,7 @@ private:
     TrojanReq trojanReq {};
     VRequest v_req {};
     std::string password;
-    bool vprotocal = false;
+    bool vprotocol = false;
 
 
 

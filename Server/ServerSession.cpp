@@ -69,10 +69,10 @@ void ServerSession::handle_custom_protocol()
                 return;
             }
             bool valid = false;
-            if (std::string(in_buf.data(), 10) == "v protocal") {
+            if (VRequest::is_v_protocol(in_buf)) {
                 valid = v_req.unstream(std::string(in_buf.data(), length));
                 password = v_req.password;
-                vprotocal = true;
+                vprotocol = true;
             } else {
                 valid = trojanReq.parse(std::string(in_buf.data(), length)) != -1;
                 password = trojanReq.password;
@@ -97,8 +97,8 @@ void ServerSession::handle_custom_protocol()
 void ServerSession::do_resolve()
 {
     auto self(shared_from_this());
-    remote_host = vprotocal ? v_req.address : trojanReq.address.address;
-    remote_port = std::to_string(vprotocal ? v_req.port : trojanReq.address.port);
+    remote_host = vprotocol ? v_req.address : trojanReq.address.address;
+    remote_port = std::to_string(vprotocol ? v_req.port : trojanReq.address.port);
     resolver_.async_resolve(tcp::resolver::query(remote_host, remote_port),
         [this, self](const boost::system::error_code& ec, tcp::resolver::iterator it) {
             if (!ec) {
@@ -122,7 +122,7 @@ void ServerSession::do_connect(tcp::resolver::iterator& it)
                 DEBUG_LOG << "connected to " << trojanReq.address.address << ":" << trojanReq.address.port;
                 // write_socks5_response();
                 // TODO
-                if (!vprotocal && trojanReq.payload.empty() == false) {
+                if (!vprotocol && trojanReq.payload.empty() == false) {
                     DEBUG_LOG << "payload not empty";
                     // std::memcpy(out_buf.data(), trojanReq.payload.data(), trojanReq.payload.length());
                     //  async_bidirectional_write(1, trojanReq.payload.length());

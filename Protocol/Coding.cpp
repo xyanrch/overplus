@@ -28,6 +28,10 @@ void Coding::EncodeStr(std::string& dst, std::string& src)
 {
     dst.append(src);
 }
+void Coding::EncodeCstr(std::string& dst, const char* src)
+{
+    dst.append(src);
+}
 uint8_t Coding::DecodeFixed8(const char* ptr)
 {
 

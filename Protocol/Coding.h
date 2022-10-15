@@ -11,6 +11,7 @@ public:
     static void EncodeFixed32(std::string& dst, uint32_t value);
 
     static void EncodeStr(std::string& dst, std::string& src);
+    static  void EncodeCstr(std::string& dst, const char* src);
 
     //
     static uint8_t DecodeFixed8(const char*ptr);

@@ -7,24 +7,11 @@
 #else
 #include <netinet/in.h>
 #endif
-/*
- struct Header {
-        uint8_t version;
-        std::uint32_t len;
-    };
-    Header header;
-    std::string password;
-    //
-    Command command;
-    //
-    AddressType address_type;
-    std::string address;
-    uint16_t port;
-    */
+
 void VRequest::stream(std::string& buf)
 {
-    header.len = 5 + header.protocal.length() + password.length() + user_name.length() + address.length() + sizeof(port);
-    Coding::EncodeStr(buf, header.protocal);
+    header.len = 5 + identifier_len + password.length() + user_name.length() + address.length() + sizeof(port);
+    Coding::EncodeCstr(buf, v_identifier);
     Coding::EncodeFixed8(buf, header.version);
     Coding::EncodeFixed32(buf, header.len);
     //
@@ -46,8 +33,8 @@ bool VRequest::unstream(const std::string& buf)
     }
     // int pos = 0;
     char* ptr = const_cast<char*>(buf.data());
-    auto id = std::string(ptr, 10);
-    ptr += 10;
+    //skip identifier
+    ptr += identifier_len;
     this->header.version = *ptr;
     ptr++;
     this->header.len = Coding::DecodeFixed32(ptr);
@@ -70,3 +57,9 @@ bool VRequest::unstream(const std::string& buf)
     this->port = ntohs(Coding::DecodeFixed16(ptr));
     return true;
 }
+ bool VRequest::is_v_protocol(std::vector<char>&buf)
+{
+    DEBUG_LOG<<"Incoming identifier:"<<std::string(buf.data(),identifier_len);
+    return memcmp(v_identifier, buf.data(),identifier_len)==0;
+}
+
