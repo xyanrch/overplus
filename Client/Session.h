@@ -1,7 +1,7 @@
 
 #pragma once
 #include "Shared/Log.h"
-#include <Protocal/socks5/socks5.h>
+#include <Protocol/socks5/socks5.h>
 #include <boost/asio.hpp>
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/ssl.hpp>

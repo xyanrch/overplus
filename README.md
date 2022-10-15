@@ -1,10 +1,10 @@
 # overplus
-Overplus is another implement of trojan protocal with better perfermance and stability.
+Overplus is another implement of trojan protocol with better perfermance and stability.
 
-**Comapared with trojan**:
+**Compared with trojan**:
 - [x] Enhanced Security
-- [x] It don't need to setup a http server on port 80 in your linux server.
-- [x] It don't need to apply a domain name.
+- [x] It doesn't need to set up a http server on port 80 in your linux server.
+- [x] It doesn't need to apply a domain name.
 - [x] More readable and cleaner code.
 
 
@@ -15,7 +15,7 @@ Run the script and follow the assistant:
 
 ``` curl -O https://raw.githubusercontent.com/xyanrch/overplus/master/install.sh && chmod +x install.sh && sudo ./install.sh ```
  
- It is recommend to enable BBR to accelerate the network speed.
+ It is recommended to enable BBR to accelerate the network speed.
 
 ## Build
 The project depend on boost and openssl libraries, please make sure install boost and openssl before build the project.
@@ -34,7 +34,7 @@ sudo ./overplus server.json
 ```
 server.json is a config file which you can custom the config in.
 
-#### exmaple config file
+#### example config file
 ```
 {
     "run_type": "server",
@@ -52,7 +52,7 @@ server.json is a config file which you can custom the config in.
 }
 ```
 ## How does overplus work?
-Trojan protocal is a socks5 like protocal.Trojan request is formed as follows:
+Trojan protocol is a socks5 like protocol.Trojan request is formed as follows:
 
         +----+-----+-------+------+----------+----------+-------+
         |Command | password| DST.ADDR | DST.PORT |packed payload
@@ -67,4 +67,4 @@ Trojan protocal is a socks5 like protocal.Trojan request is formed as follows:
 
 ## Roadmap
 - [ ] Implement a web console to manage overplus
-- [ ] Design a new protocal to replace trojan protocal
+- [ ] Design a new protocol to replace trojan protocol

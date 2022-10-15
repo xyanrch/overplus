@@ -20,7 +20,7 @@ find_package(Threads REQUIRED)
 find_package(OpenSSL REQUIRED)
 add_subdirectory(Shared)
 add_subdirectory(Server)
-add_subdirectory(Protocal)
+add_subdirectory(Protocol)
 add_subdirectory(Client)
 
 add_executable(overplus Server/main.cpp)
