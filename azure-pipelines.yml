@@ -17,7 +17,12 @@ stages:
       - job: Windows
         pool:
           vmImage: windows-latest
+        variables:
+          - name: VCPKG_BINARY_SOURCES
+            value: 'clear;nuget,https://pkgs.dev.azure.com/overplusProxy/overplus/_packaging/vcpkg_cache/nuget/v3/index.json,readwrite'
         steps:
+           # Remember to add this task to allow vcpkg to upload archives via NuGet
+          - task: NuGetAuthenticate@0
           - script: git clone https://github.com/microsoft/vcpkg
             displayName: Checkout vcpkg
           - script: .\vcpkg\bootstrap-vcpkg.bat
