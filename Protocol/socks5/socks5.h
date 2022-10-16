@@ -93,8 +93,8 @@ public:
         Coding::EncodeFixed8(buf, reserved);
 
         Coding::EncodeFixed8(buf, static_cast<uint8_t>(addrtype));
-        Coding::EncodeFixed32(buf, realRemoteIP);
-        Coding::EncodeFixed16(buf, realRemotePort);
+        Coding::EncodeFixed32(buf, htonl(realRemoteIP));
+        Coding::EncodeFixed16(buf, htons(realRemotePort));
     }
 
 public:

@@ -12,7 +12,10 @@
 
 Loglevel log_level = L_NOTICE;
 static Destination log_dest = D_STDOUT;
-
+void setLogLevel(Loglevel& level)
+{
+    log_level = level;
+}
 static std::function<void()> flush_ = []() {
     std::flush(std::cout);
 };

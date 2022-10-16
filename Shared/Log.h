@@ -37,6 +37,7 @@ private:
     };
     Impl impl;
 };
+void setLogLevel(Loglevel& level);
 
 #define DEBUG_LOG                           \
     if (logger::get_log_level() <= L_DEBUG) \
