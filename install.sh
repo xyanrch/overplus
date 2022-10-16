@@ -108,7 +108,7 @@ function install_overplus(){
     green "======================="
     read USER_PASSWORD
     
-    blue "What port do you want OpenVPN to listen to?"
+    blue "What port do you want Overplus to listen to?"
     echo "   1) Default(recommend): 443"
     echo "   2) Custom"
     until [[ $PORT_CHOICE =~ ^[1-2]$ ]]; do
