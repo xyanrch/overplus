@@ -65,7 +65,7 @@ git clone https://github.com/Microsoft/vcpkg.git
 ```
 **Install dependence**
 ```commandline
-.\vcpkg\vcpkg.exe install
+.\vcpkg\vcpkg.exe install --triplet x64-windows
 ```
 **Build project**
 ```commandline

@@ -22,7 +22,7 @@ stages:
             displayName: Checkout vcpkg
           - script: .\vcpkg\bootstrap-vcpkg.bat
             displayName: Bootstrap vcpkg
-          - script: .\vcpkg\vcpkg.exe install boost --triplet x64-windows --vcpkg-root .\vcpkg
+          - script: .\vcpkg\vcpkg.exe  install --triplet x64-windows
             displayName: vcpkg install dependencies
           - bash: |
               set -euo pipefail
