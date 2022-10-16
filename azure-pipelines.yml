@@ -27,8 +27,6 @@ stages:
             displayName: Checkout vcpkg
           - script: .\vcpkg\bootstrap-vcpkg.bat
             displayName: Bootstrap vcpkg
-          - script: .\vcpkg\vcpkg.exe  install --triplet x64-windows
-            displayName: vcpkg install dependencies
           - bash: |
               set -euo pipefail
               cmake  -A x64 -B . -S .  -DCMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake 
