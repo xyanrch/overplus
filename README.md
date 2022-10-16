@@ -15,29 +15,31 @@ Overplus is another implement of trojan protocol with better perfermance and sta
 ## One-click deployment
 Run the script and follow the assistant:
 
-``` curl -O https://raw.githubusercontent.com/xyanrch/overplus/master/install.sh && chmod +x install.sh && sudo ./install.sh ```
+``` commandline 
+curl -O https://raw.githubusercontent.com/xyanrch/overplus/master/install.sh && chmod +x install.sh && sudo ./install.sh
+ ```
  
  It is recommended to enable BBR to accelerate the network speed.
 
 ## Build
 The project depend on boost and openssl libraries, please make sure install boost and openssl before build the project.
 
-### how to build
-``` 
+### How to build
+``` commandline
 mkdir build && cd build
 cmake ..
 make
 
 ```
-### how to run
+### How to run
 
-``` 
+``` commandline
 sudo ./overplus server.json
 ```
 server.json is a config file which you can customize.
 
-#### example config file
-```
+#### Example config file
+```json
 {
     "run_type": "server",
     "local_addr": "0.0.0.0",
@@ -52,6 +54,22 @@ server.json is a config file which you can customize.
         "key": "path_to_key"
     }
 }
+```
+## Windows platform build
+Windows use vcpkg to manage library
+
+**Dowload vcpkg**
+```commandline
+git clone https://github.com/Microsoft/vcpkg.git
+.\vcpkg\bootstrap-vcpkg.bat
+```
+**Install dependence**
+```commandline
+.\vcpkg\vcpkg.exe install
+```
+**Build project**
+```commandline
+make -B build -S . -DCMAKE_TOOLCHAIN_FILE=.\vcpkg\scripts\buildsystems\vcpkg.cmake
 ```
 ## How does overplus work?
 Trojan protocol is a socks5 like protocol.Trojan request is formed as follows:
