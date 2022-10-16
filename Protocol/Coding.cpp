@@ -39,15 +39,16 @@ uint8_t Coding::DecodeFixed8(const char* ptr)
 }
 uint16_t Coding::DecodeFixed16(const char* ptr)
 {
-
-    return static_cast<uint16_t>(ptr[0]) | static_cast<uint16_t>(ptr[1]) << 8;
+    const uint8_t*buff = reinterpret_cast<const uint8_t*>(ptr);
+    return static_cast<uint16_t>(buff[0]) | static_cast<uint16_t>(buff[1]) << 8;
 }
 uint32_t Coding::DecodeFixed32(const char* ptr)
 {
-    return static_cast<uint32_t>(ptr[0])
-        | static_cast<uint32_t>(ptr[1]) << 8
-        | static_cast<uint32_t>(ptr[2]) << 16
-        | static_cast<uint32_t>(ptr[3]) << 24;
+    const uint8_t*buff = reinterpret_cast<const uint8_t*>(ptr);
+    return static_cast<uint32_t>(buff[0])
+        | static_cast<uint32_t>(buff[1]) << 8
+        | static_cast<uint32_t>(buff[2]) << 16
+        | static_cast<uint32_t>(buff[3]) << 24;
 }
 std::string Coding::DecodeStr(const char* ptr, int len)
 {

@@ -21,8 +21,15 @@ stages:
           - name: VCPKG_BINARY_SOURCES
             value: 'clear;nuget,https://pkgs.dev.azure.com/overplusProxy/overplus/_packaging/vcpkg_cache/nuget/v3/index.json,readwrite'
         steps:
-           # Remember to add this task to allow vcpkg to upload archives via NuGet
+          # Remember to add this task to allow vcpkg to upload archives via NuGet
           - task: NuGetAuthenticate@0
+            displayName: 'NuGet Authenticate'
+          - task: NuGetCommand@2
+            displayName: 'NuGet push'
+            inputs:
+              command: push
+              publishVstsFeed: 'overplus/vcpkg_cache'
+              allowPackageConflicts: true
           - script: git clone https://github.com/microsoft/vcpkg
             displayName: Checkout vcpkg
           - script: .\vcpkg\bootstrap-vcpkg.bat
