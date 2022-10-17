@@ -56,10 +56,7 @@ void ServerSession::start()
 }
 void ServerSession::handle_custom_protocol()
 {
-    // trojan handshak
     auto self = shared_from_this();
-    // upstream_ssl_socket.next_layer().read_some(boost::asio::buffer)read_some()
-    //  char temp[4096];
     upstream_ssl_socket.async_read_some(boost::asio::buffer(in_buf),
         [this, self](boost::system::error_code ec, std::size_t length) {
             if (ec) {
@@ -121,12 +118,9 @@ void ServerSession::do_connect(tcp::resolver::iterator& it)
                 boost::asio::socket_base::keep_alive option(true);
                 downstream_socket.set_option(option);
                 DEBUG_LOG << "connected to " << remote_host << ":" << remote_port;
-                // write_socks5_response();
-                // TODO
+
                 if (!vprotocol && trojanReq.payload.empty() == false) {
                     DEBUG_LOG << "payload not empty";
-                    // std::memcpy(out_buf.data(), trojanReq.payload.data(), trojanReq.payload.length());
-                    //  async_bidirectional_write(1, trojanReq.payload.length());
 
                     boost::asio::async_write(downstream_socket, boost::asio::buffer(trojanReq.payload),
                         [this, self](boost::system::error_code ec, std::size_t length) {
