@@ -1,7 +1,7 @@
 message(STATUS "Enter Protocal CMakeList ...")
 set(proto_SRCS
         socks5/socks5.cpp
-        Coding.cpp
+        ../Shared/Coding.cpp
         TrojanReq.cpp
         VProtocal/VRequest.cpp
         )

@@ -3,7 +3,7 @@
 // https://www.rfc-editor.org/rfc/rfc1928
 
 #pragma once
-#include "../Coding.h"
+#include "Shared/Coding.h"
 
 #include <Shared/Log.h>
 #include <boost/asio.hpp>

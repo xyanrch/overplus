@@ -1,6 +1,6 @@
 
 #include "VRequest.h"
-#include "../Coding.h"
+#include "Shared/Coding.h"
 #include "Shared/Log.h"
 #include <cstdint>
 
