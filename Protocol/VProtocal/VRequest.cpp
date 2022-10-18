@@ -30,7 +30,7 @@ void VRequest::stream(std::string& buf)
     Coding::EncodeStr(buf, address);
     //
     Coding::EncodeFixed16(buf, htons(port));
-    NOTICE_LOG<<"header.len=" << header.len<<  " dump buf:" << buf;
+    DEBUG_LOG<<"header.len=" << header.len<<  " dump buf:" << buf;
 }
 
 bool VRequest::unstream(const std::string& buf)
@@ -46,7 +46,6 @@ bool VRequest::unstream(const std::string& buf)
     this->header.version = *ptr;
     ptr++;
     this->header.len = ntohl(Coding::DecodeFixed32(ptr));
-    NOTICE_LOG << "header.len:" << this->header.len << "  buf length:" << buf.length();
     if (this->header.len > buf.length()) {
         NOTICE_LOG << "header.len:" << this->header.len << "  buf length:" << buf.length();
         return false;
