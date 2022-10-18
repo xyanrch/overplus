@@ -19,7 +19,9 @@ Run the script and follow the assistant:
 curl -O https://raw.githubusercontent.com/xyanrch/overplus/master/install.sh && chmod +x install.sh && sudo ./install.sh
  ```
  
- It is recommended to enable BBR to accelerate the network speed.
+ **It is strongly recommended to enable BBR to accelerate the network speed.**
+ 
+**[Enable BBR on 20.04 and CentOS 8](https://cloud.tencent.com/developer/article/1946062)**
 
 ## Build
 The project depend on boost and openssl libraries, please make sure install boost and openssl before build the project.
