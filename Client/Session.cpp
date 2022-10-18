@@ -20,6 +20,9 @@ Session::Session(boost::asio::io_context& context, boost::asio::ssl::context& ss
 
 {
     out_socket.set_verify_mode(boost::asio::ssl::verify_none);
+    auto& config = ConfigManage::instance().client_cfg;
+    remote_host = config.remote_addr;
+    remote_port = config.remote_port;
 }
 
 void Session::start()
@@ -103,8 +106,7 @@ void Session::read_socks5_request()
 void Session::do_resolve(const Request& req)
 {
     auto self(shared_from_this());
-    auto& config = ConfigManage::instance().client_cfg;
-    resolver_.async_resolve(tcp::resolver::query(config.remote_addr, config.remote_port),
+    resolver_.async_resolve(tcp::resolver::query(remote_host, remote_port),
         [req, this, self](const boost::system::error_code& ec, tcp::resolver::iterator it) {
             if (!ec) {
                 do_connect(it, req);
@@ -155,6 +157,7 @@ void Session::do_sent_v_req(const Request& req)
     request.address = req.remote_host;
     request.port = req.remote_port;
     request.stream(message_buf);
+    NOTICE_LOG<<" v protocol send buf:"<<message_buf;
 
     boost::asio::async_write(out_socket, boost::asio::buffer(message_buf), // Always 10-byte according to RFC1928
         [this, self](boost::system::error_code ec, std::size_t length) {

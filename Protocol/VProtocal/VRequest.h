@@ -27,4 +27,7 @@ public:
     //
     std::string address;
     uint16_t port;
+
+    //packed buffer,  Don't stream/unstream this field
+    std::string packed_buff;
 };

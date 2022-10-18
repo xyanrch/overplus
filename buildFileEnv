@@ -8,19 +8,16 @@ SHELL ["/bin/bash", "-c"]
 RUN apt-get update && apt-get -y --no-install-recommends install \
     build-essential \
     libssl-dev \
-    clang \
     cmake \
-    gdb \
     wget
-
 
 # Let us add some heavy dependency
 RUN cd ${HOME} && \
     wget --no-check-certificate --quiet \
-        https://boostorg.jfrog.io/artifactory/main/release/1.66.0/source/boost_1_66_0.tar.gz && \
-        tar xzf ./boost_1_66_0.tar.gz && \
-        cd ./boost_1_66_0 && \
+        https://boostorg.jfrog.io/artifactory/main/release/1.73.0/source/boost_1_73_0.tar.gz && \
+        tar xzf ./boost_1_73_0.tar.gz && \
+        cd ./boost_1_73_0 && \
         ./bootstrap.sh && \
-        ./b2 install && \
+        ./b2  -j$(nproc) --with-system --with-program_options variant=release link=static threading=multi runtime-link=shared install && \
         cd .. && \
-        rm -rf ./boost_1_66
+        rm -rf ./boost_1_73

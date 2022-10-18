@@ -15,7 +15,7 @@
 void VRequest::stream(std::string& buf)
 {
 
-    header.len = 5 + identifier_len + password.length() + user_name.length() + address.length() + sizeof(port);
+    header.len = 5 + identifier_len + password.length()+4 + user_name.length()+4 + address.length()+4 + sizeof(port);
     Coding::EncodeCstr(buf, v_identifier);
     Coding::EncodeFixed8(buf, header.version);
     Coding::EncodeFixed32(buf, htonl(header.len));
@@ -64,6 +64,7 @@ bool VRequest::unstream(const std::string& buf)
     this->address = Coding::DecodeStr(ptr, len);
     ptr += len;
     this->port = ntohs(Coding::DecodeFixed16(ptr));
+    packed_buff.assign(ptr+2,buf.size()-header.len);
     return true;
 }
 
