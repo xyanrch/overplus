@@ -157,7 +157,7 @@ void Session::do_sent_v_req(const Request& req)
     request.address = req.remote_host;
     request.port = req.remote_port;
     request.stream(message_buf);
-    NOTICE_LOG<<" v protocol send buf:"<<message_buf;
+    DEBUG_LOG<<" v protocol send buf:"<<message_buf;
 
     boost::asio::async_write(out_socket, boost::asio::buffer(message_buf), // Always 10-byte according to RFC1928
         [this, self](boost::system::error_code ec, std::size_t length) {

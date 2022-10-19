@@ -12,10 +12,10 @@
 
 #endif
 
-void VRequest::stream(std::string& buf)
-{
+void VRequest::stream(std::string &buf) {
 
-    header.len = 5 + identifier_len + password.length()+4 + user_name.length()+4 + address.length()+4 + sizeof(port);
+    header.len =
+            5 + identifier_len + password.length() + 4 + user_name.length() + 4 + address.length() + 4 + sizeof(port);
     Coding::EncodeCstr(buf, v_identifier);
     Coding::EncodeFixed8(buf, header.version);
     Coding::EncodeFixed32(buf, htonl(header.len));
@@ -30,17 +30,16 @@ void VRequest::stream(std::string& buf)
     Coding::EncodeStr(buf, address);
     //
     Coding::EncodeFixed16(buf, htons(port));
-    DEBUG_LOG<<"header.len=" << header.len<<  " dump buf:" << buf;
+    DEBUG_LOG << "header.len=" << header.len << " dump buf:" << buf;
 }
 
-bool VRequest::unstream(const std::string& buf)
-{
+bool VRequest::unstream(const std::string &buf) {
     if (buf.length() < sizeof(Header)) {
         NOTICE_LOG << "Buf len:" << buf.length() << " head size:" << sizeof(Header);
         return false;
     }
     // int pos = 0;
-    char* ptr = const_cast<char*>(buf.data());
+    char *ptr = const_cast<char *>(buf.data());
     // skip identifier
     ptr += identifier_len;
     this->header.version = *ptr;
@@ -64,12 +63,13 @@ bool VRequest::unstream(const std::string& buf)
     this->address = Coding::DecodeStr(ptr, len);
     ptr += len;
     this->port = ntohs(Coding::DecodeFixed16(ptr));
-    packed_buff.assign(ptr+2,buf.size()-header.len);
+    if (buf.size() > header.len) {
+        packed_buff.assign(ptr + 2, buf.size() - header.len);
+    }
     return true;
 }
 
-bool VRequest::is_v_protocol(std::vector<char>& buf)
-{
+bool VRequest::is_v_protocol(std::vector<char> &buf) {
     DEBUG_LOG << "Incoming identifier:" << std::string(buf.data(), identifier_len);
     return memcmp(v_identifier, buf.data(), identifier_len) == 0;
 }
