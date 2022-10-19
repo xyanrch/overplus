@@ -72,7 +72,8 @@ git clone https://github.com/Microsoft/vcpkg.git
 ```
 **Build project**
 ```commandline
-make -B build -S . -DCMAKE_TOOLCHAIN_FILE="\vcpkg\scripts\buildsystems\vcpkg.cmake"
+cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE="..\vcpkg\scripts\buildsystems\vcpkg.cmake"
+cmake --build build
 ```
 ## How does overplus work?
 Trojan protocol is a socks5 like protocol.Trojan request is formed as follows:
