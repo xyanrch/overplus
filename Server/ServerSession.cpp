@@ -69,7 +69,6 @@ void ServerSession::handle_custom_protocol()
                 valid = v_req.unstream(std::string(in_buf.data(), length));
                 password = v_req.password;
                 vprotocol = true;
-                NOTICE_LOG<<" v protocol recieve buf:"<<std::string(in_buf.data(),length);
             } else {
                 valid = trojanReq.parse(std::string(in_buf.data(), length)) != -1;
                 password = trojanReq.password;
