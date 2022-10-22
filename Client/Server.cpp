@@ -6,17 +6,22 @@
 Server::Server(const std::string& address, const std::string& port)
     : context_pool(5)
     , io_context(context_pool.get_io_context())
-    , signals(io_context)
+   // , signals(io_context)
     , acceptor_(io_context)
     , ssl_ctx(boost::asio::ssl::context::tlsv13)
 {
     add_signals();
     ip::tcp::resolver resover(io_context);
-    ip::tcp::endpoint endpoint = *resover.resolve(address, port).begin();
+    local_endpoint = *resover.resolve(address, port).begin();
 
-    acceptor_.open(endpoint.protocol());
+  // start_accept();
+}
+
+void Server::start_accept()
+{
+    acceptor_.open(local_endpoint.protocol());
     acceptor_.set_option(ip::tcp::acceptor::reuse_address(true));
-    acceptor_.bind(endpoint);
+    acceptor_.bind(local_endpoint);
     acceptor_.listen();
     do_accept();
 }
@@ -47,9 +52,19 @@ void Server::run()
     NOTICE_LOG << "Server start..." << std::endl;
     context_pool.run();
 }
+void Server::stop()
+{
+    NOTICE_LOG << "Server stopped..." << std::endl;
+    context_pool.stop();
+}
+void Server::stop_accept()
+{
+    acceptor_.cancel();
+    acceptor_.close();
+}
 void Server::add_signals()
 {
-    signals.add(SIGINT);
+   /* signals.add(SIGINT);
     signals.add(SIGTERM);
 #ifdef SIGQUIT
     signals.add(SIGQUIT);
@@ -59,5 +74,5 @@ void Server::add_signals()
 
         NOTICE_LOG << "Server stopped..." << std::endl;
         exit(1);
-    });
+    });*/
 }

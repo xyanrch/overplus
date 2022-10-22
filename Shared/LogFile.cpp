@@ -9,7 +9,7 @@
     */
 AppendFile::AppendFile(const char* filename)
 {
-    fp_ = fopen(filename, "ae");
+    fp_ = fopen(filename, "a");
     assert(fp_);
 }
 

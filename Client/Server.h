@@ -13,19 +13,25 @@ class Server : private boost::noncopyable {
 public:
     Server(const std::string& address, const std::string& port);
     void run();
+    void stop();
+    void start_accept();
+    void stop_accept();
 
 private:
     void add_signals();
     void do_accept();
+
 
 private:
     IoContextPool context_pool;
     // ios_deque io_contexts_;
     boost::asio::io_context& io_context;
 
-    boost::asio::signal_set signals;
+    //boost::asio::signal_set signals;
     boost::asio::ip::tcp::acceptor acceptor_;
 
     boost::asio::ssl::context ssl_ctx;
+    std::shared_ptr<Session> new_session;
+    ip::tcp::endpoint local_endpoint;
 };
 #endif
