@@ -4,7 +4,7 @@
 #include <memory>
 
 Server::Server(const std::string& address, const std::string& port)
-    : context_pool(5)
+    : context_pool(2)
     , io_context(context_pool.get_io_context())
    // , signals(io_context)
     , acceptor_(io_context)

@@ -89,7 +89,7 @@ int main(int argc, char *argv[])
 {   ConfigManage::instance().load_config("client.json", ConfigManage::Client);
     auto& config = ConfigManage::instance().client_cfg;
     LogFile logfile_("overplus", 10 * 1024 * 1024);
-    logger::set_log_level(ConfigManage::instance().server_cfg.log_level);
+    //logger::set_log_level(ConfigManage::instance().server_cfg.log_level);
     logger::set_log_destination(Destination::D_FILE);
     logger::setOutput([&](std::string&& buf) {
         logfile_.append(std::move(buf));
