@@ -59,8 +59,11 @@ void Server::stop()
 }
 void Server::stop_accept()
 {
-    acceptor_.cancel();
-    acceptor_.close();
+    if(acceptor_.is_open())
+    {
+        acceptor_.cancel();
+       acceptor_.close();
+    }
 }
 void Server::add_signals()
 {

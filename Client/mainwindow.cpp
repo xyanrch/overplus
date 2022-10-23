@@ -9,6 +9,7 @@ MainWindow::MainWindow(Server&s,QWidget *parent)
 {
 
     ui->setupUi(this);
+    this->layout()->setSizeConstraint(QLayout::SetFixedSize);
     connect(ui->CONNECT_BUTTON, SIGNAL(clicked()), this, SLOT(onConnect()));
     connect(ui->DISCONNECT_BUTTON, SIGNAL(clicked()), this, SLOT(onDisconnect()));
 
@@ -36,6 +37,7 @@ MainWindow::~MainWindow()
       ui->CONNECT_BUTTON->setEnabled(true);
       ui->DISCONNECT_BUTTON->setEnabled(false);
       ui->CONNECTION_STATUS->setText("DISCONNECTED");
+
  }
 
 
