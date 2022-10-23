@@ -7,36 +7,35 @@ MainWindow::MainWindow(Server&s,QWidget *parent)
     , ui(new Ui::MainWindow)
     ,server(s)
 {
-   // this->setAttribute(Qt::WA_DeleteOnClose);
+
     ui->setupUi(this);
-    connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(onConnect()));
-    connect(ui->pushButton_2, SIGNAL(clicked()), this, SLOT(onDisconnect()));
+    connect(ui->CONNECT_BUTTON, SIGNAL(clicked()), this, SLOT(onConnect()));
+    connect(ui->DISCONNECT_BUTTON, SIGNAL(clicked()), this, SLOT(onDisconnect()));
 
 
 }
 
 MainWindow::~MainWindow()
 {
-    std::cout<<"destruct called mainwindow"<<std::endl;
-   //server.stop();
+
     delete ui;
 
 }
  void MainWindow::onConnect()
  {
      server.start_accept();
-    // QMessageBox::about(this,"Tsignal","button clicked down");
-     ui->pushButton->setEnabled(false);
-      ui->pushButton_2->setEnabled(true);
+     ui->CONNECT_BUTTON->setEnabled(false);
+      ui->DISCONNECT_BUTTON->setEnabled(true);
+   ui->CONNECTION_STATUS->setText("CONNECTED");
 
  }
 
  void MainWindow::onDisconnect()
  {
      server.stop_accept();
-     //QMessageBox::about(this,"Tsignal","button disconnect clicked down");
-      ui->pushButton->setEnabled(true);
-      ui->pushButton_2->setEnabled(false);
+      ui->CONNECT_BUTTON->setEnabled(true);
+      ui->DISCONNECT_BUTTON->setEnabled(false);
+      ui->CONNECTION_STATUS->setText("DISCONNECTED");
  }
 
 
