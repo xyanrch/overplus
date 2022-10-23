@@ -52,7 +52,7 @@
      <rect>
       <x>172</x>
       <y>40</y>
-      <width>271</width>
+      <width>281</width>
       <height>171</height>
      </rect>
     </property>
@@ -64,7 +64,11 @@
       <widget class="QLineEdit" name="HOST_PORT"/>
      </item>
      <item>
-      <widget class="QLineEdit" name="HOST_PORT_2"/>
+      <widget class="QLineEdit" name="HOST_PASSWD">
+       <property name="echoMode">
+        <enum>QLineEdit::Password</enum>
+       </property>
+      </widget>
      </item>
     </layout>
    </widget>
@@ -94,7 +98,7 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>30</x>
@@ -127,7 +131,7 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>160</x>
@@ -174,6 +178,19 @@
       </widget>
      </item>
     </layout>
+   </widget>
+   <widget class="QCheckBox" name="checkBox">
+    <property name="geometry">
+     <rect>
+      <x>460</x>
+      <y>170</y>
+      <width>91</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>visible</string>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">

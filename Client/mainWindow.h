@@ -18,6 +18,7 @@ public:
 public slots:
     void onConnect();
     void onDisconnect();
+    void onCheckBoxClick();
 private:
     Ui::MainWindow *ui;
     Server& server;

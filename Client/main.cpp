@@ -86,8 +86,12 @@ bool  disable_system_socks_proxy()
 
 }
 int main(int argc, char *argv[])
-{   ConfigManage::instance().load_config("client.json", ConfigManage::Client);
+{
+    //ConfigManage::instance().load_config("client.json", ConfigManage::Client);
     auto& config = ConfigManage::instance().client_cfg;
+    config.local_addr="127.0.0.1";
+    config.local_port = "1080";
+    config.user_name = "test_usr";
     LogFile logfile_("overplus", 10 * 1024 * 1024);
     //logger::set_log_level(ConfigManage::instance().server_cfg.log_level);
     logger::set_log_destination(Destination::D_FILE);

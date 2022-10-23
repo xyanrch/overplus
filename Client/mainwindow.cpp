@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include<QMessageBox>
+#include "Shared/ConfigManage.h"
 
 MainWindow::MainWindow(Server&s,QWidget *parent)
     : QMainWindow(parent)
@@ -9,9 +10,10 @@ MainWindow::MainWindow(Server&s,QWidget *parent)
 {
 
     ui->setupUi(this);
-    this->layout()->setSizeConstraint(QLayout::SetFixedSize);
+    setWindowTitle("overplus");
     connect(ui->CONNECT_BUTTON, SIGNAL(clicked()), this, SLOT(onConnect()));
     connect(ui->DISCONNECT_BUTTON, SIGNAL(clicked()), this, SLOT(onDisconnect()));
+    connect(ui->checkBox, SIGNAL(clicked()), this, SLOT(onCheckBoxClick()));
 
 
 }
@@ -24,10 +26,23 @@ MainWindow::~MainWindow()
 }
  void MainWindow::onConnect()
  {
-     server.start_accept();
+
      ui->CONNECT_BUTTON->setEnabled(false);
-      ui->DISCONNECT_BUTTON->setEnabled(true);
-   ui->CONNECTION_STATUS->setText("CONNECTED");
+     ui->DISCONNECT_BUTTON->setEnabled(true);
+    ui->CONNECTION_STATUS->setText("CONNECTED");
+
+    auto& config = ConfigManage::instance().client_cfg;
+    config.remote_addr = ui->HOST_NAME->text().toStdString();
+    config.remote_port = ui->HOST_PORT->text().toStdString();
+
+    auto psswd = ui->HOST_PASSWD->text().toStdString();
+    config.setPassword(psswd);
+    NOTICE_LOG<<"Read config frome user input:"<<config.remote_addr<<":"<< config.remote_port<<" password:"<<psswd;
+
+    //config.password = ui->
+    server.start_accept();
+
+
 
  }
 
@@ -38,6 +53,10 @@ MainWindow::~MainWindow()
       ui->DISCONNECT_BUTTON->setEnabled(false);
       ui->CONNECTION_STATUS->setText("DISCONNECTED");
 
+ }
+ void MainWindow::onCheckBoxClick(){
+
+      ui->HOST_PASSWD->setEchoMode(ui->checkBox->checkState() == Qt::Checked ? QLineEdit::Normal : QLineEdit::Password );
  }
 
 

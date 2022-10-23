@@ -68,6 +68,10 @@ void ClientConfig::populate(boost::property_tree::ptree& tree)
     user_name = tree.get("user_name", std::string());
     password = SHA224(tree.get("password", std::string()));
 }
+void ClientConfig::setPassword(std::string&psswd)
+{
+     password = SHA224(psswd);
+}
 void ServerConfig::populate(boost::property_tree::ptree& tree)
 {
     local_addr = tree.get("local_addr", std::string());

@@ -57,6 +57,7 @@ struct ClientConfig {
     std::string password;
     std::string user_name;
     void populate(boost::property_tree::ptree&);
+    void setPassword(std::string&psswd);
 
 };
 class ConfigManage : private boost::noncopyable {
