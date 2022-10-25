@@ -161,7 +161,7 @@
         </font>
        </property>
        <property name="text">
-        <string>10MB/S</string>
+        <string>N/A</string>
        </property>
       </widget>
      </item>
@@ -173,7 +173,7 @@
         </font>
        </property>
        <property name="text">
-        <string>1MB/S</string>
+        <string>N/A</string>
        </property>
       </widget>
      </item>

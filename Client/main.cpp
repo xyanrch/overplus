@@ -12,7 +12,7 @@
 #include<windows.h>
 #include<stdio.h>
 
-bool  enable_system_socks_proxy()
+bool  disable_system_socks_proxy()
 {
     HKEY hRoot = HKEY_CURRENT_USER;
     const char* szSubKey="Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings";
@@ -23,18 +23,18 @@ bool  enable_system_socks_proxy()
      if (lRet != ERROR_SUCCESS)
             return false;
 
-     //enable proxy
-     int val = 1;
+     //disable proxy
+     int val = 0;
 
      lRet = RegSetValueEx(hKey, "ProxyEnable", 0, REG_DWORD, (BYTE*)&val, sizeof(DWORD));
 
      if (lRet == ERROR_SUCCESS)
      {
-         printf("enable proxy succussfully!\n");
+         NOTICE_LOG<<"enable proxy succussfully!";
      }
      else
      {
-         printf("enable proxy failed!\n");
+         ERROR_LOG<<"enable proxy failed!";
          return false;
      }
 
@@ -43,7 +43,7 @@ bool  enable_system_socks_proxy()
 
 }
 
-bool  disable_system_socks_proxy()
+bool  enable_system_socks_proxy()
 {
     HKEY hRoot = HKEY_CURRENT_USER;
     const char* szSubKey="Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings";
@@ -58,26 +58,26 @@ bool  disable_system_socks_proxy()
 
      if (lRet == ERROR_SUCCESS)
      {
-         printf("proxy protocol set succussfully!\n");
+         NOTICE_LOG<<"proxy protocol set succussfull";
      }
      else
      {
-         printf("proxy protocol set failed!\n");
+         ERROR_LOG<<"proxy protocol set failed!";
          return false;
      }
 
      //enable proxy
-     int val = 0;
+     int val = 1;
 
      lRet = RegSetValueEx(hKey, "ProxyEnable", 0, REG_DWORD, (BYTE*)&val, sizeof(DWORD));
 
      if (lRet == ERROR_SUCCESS)
      {
-         printf("Disable proxy succussfully!\n");
+         NOTICE_LOG<<"enable proxy succussfully";
      }
      else
      {
-         printf("Diable proxy failed!\n");
+         ERROR_LOG<<"enable proxy failed!";
          return false;
      }
 
