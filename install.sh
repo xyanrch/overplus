@@ -54,21 +54,12 @@ function generate_certifiate(){
         tar xzf ~/easy-rsa.tgz --strip-components=1 --directory /etc/overplus/easy-rsa
         rm -f ~/easy-rsa.tgz
         cd /etc/overplus/easy-rsa/ || return
-        case $CERT_TYPE in
-            1)
-                echo "set_var EASYRSA_ALGO ec" >vars
-                echo "set_var EASYRSA_CURVE $CERT_CURVE" >>vars
-            ;;
-            2)
-                echo "set_var EASYRSA_KEY_SIZE $RSA_KEY_SIZE" >vars
-            ;;
-        esac
+
         # Generate a random, alphanumeric identifier of 16 characters for CN and one for server name
         SERVER_CN="cn_$(head /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)"
         echo "$SERVER_CN" >SERVER_CN_GENERATED
         SERVER_NAME="server_$(head /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)"
         echo "$SERVER_NAME" >SERVER_NAME_GENERATED
-        echo "set_var EASYRSA_REQ_CN $SERVER_CN" >>vars
         # Create the PKI, set up the CA, the DH params and the server certificate
         ./easyrsa init-pki
         ./easyrsa --batch build-ca nopass
@@ -87,7 +78,7 @@ function generate_certifiate(){
 }
 function install_overplus(){
     $systemPackage -y install net-tools socat
-    $systemPackage -y install   wget unzip zip curl tar >/dev/null 2>&1
+    $systemPackage -y install  xz-utils  wget unzip zip curl tar >/dev/null 2>&1
     Port443=`netstat -tlpn | awk -F '[: ]+' '$1=="tcp"{print $5}' | grep -w 443`
     if [ -n "$Port443" ]; then
         process443=`netstat -tlpn | awk -F '[: ]+' '$5=="443"{print $9}'`
