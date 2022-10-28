@@ -57,6 +57,7 @@ void ConfigManage::load_config(const std::string& path, ConfigType type)
     else {
         ERROR_LOG << "Expected server type config";
     }
+    loaded = true;
 
 }
 void ClientConfig::populate(boost::property_tree::ptree& tree)
@@ -66,11 +67,13 @@ void ClientConfig::populate(boost::property_tree::ptree& tree)
     remote_addr = tree.get("remote_addr", std::string());
     remote_port = tree.get("remote_port", std::string());
     user_name = tree.get("user_name", std::string());
-    password = SHA224(tree.get("password", std::string()));
+    text_password = tree.get("password", std::string());
+    password = SHA224(text_password);
 }
 void ClientConfig::setPassword(std::string&psswd)
 {
      password = SHA224(psswd);
+     text_password = psswd;
 }
 void ServerConfig::populate(boost::property_tree::ptree& tree)
 {

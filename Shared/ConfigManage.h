@@ -56,6 +56,7 @@ struct ClientConfig {
     std::string remote_port;
     std::string password;
     std::string user_name;
+    std::string text_password;
     void populate(boost::property_tree::ptree&);
     void setPassword(std::string&psswd);
 
@@ -75,6 +76,7 @@ public:
 public:
     ClientConfig client_cfg;
     ServerConfig server_cfg;
+    bool loaded=false;
 
 private:
     ConfigManage() = default;

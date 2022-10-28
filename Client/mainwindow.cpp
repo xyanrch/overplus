@@ -15,6 +15,13 @@ MainWindow::MainWindow(Server&s,QWidget *parent)
     connect(ui->DISCONNECT_BUTTON, SIGNAL(clicked()), this, SLOT(onDisconnect()));
     connect(ui->checkBox, SIGNAL(clicked()), this, SLOT(onCheckBoxClick()));
 
+    if(ConfigManage::instance().loaded)
+    {    auto& config = ConfigManage::instance().client_cfg;
+         ui->HOST_NAME->setText(QString::fromStdString(config.remote_addr));
+         ui->HOST_PORT->setText(QString::fromStdString(config.remote_port));
+         ui->HOST_PASSWD->setText(QString::fromStdString(config.text_password));
+    }
+
 
 }
 
@@ -30,15 +37,16 @@ MainWindow::~MainWindow()
      ui->CONNECT_BUTTON->setEnabled(false);
      ui->DISCONNECT_BUTTON->setEnabled(true);
     ui->CONNECTION_STATUS->setText("CONNECTED");
-
-    auto& config = ConfigManage::instance().client_cfg;
+   if(!ConfigManage::instance().loaded)
+    {
+       auto& config = ConfigManage::instance().client_cfg;
     config.remote_addr = ui->HOST_NAME->text().toStdString();
     config.remote_port = ui->HOST_PORT->text().toStdString();
 
     auto psswd = ui->HOST_PASSWD->text().toStdString();
     config.setPassword(psswd);
     NOTICE_LOG<<"Read config frome user input:"<<config.remote_addr<<":"<< config.remote_port<<" password:"<<psswd;
-
+}
     //config.password = ui->
     server.start_accept();
 

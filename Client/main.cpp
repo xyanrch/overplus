@@ -7,7 +7,8 @@
 #include "Shared/LogFile.h"
 
 #include "mainwindow.h"
-
+#include<QFileInfo>
+#include<QFile>
 #include <QApplication>
 #include<windows.h>
 #include<stdio.h>
@@ -32,11 +33,11 @@ bool  disable_system_socks_proxy()
 
      if (lRet == ERROR_SUCCESS)
      {
-         NOTICE_LOG<<"enable proxy succussfully!";
+         NOTICE_LOG<<"disable proxy succussfully!";
      }
      else
      {
-         ERROR_LOG<<"enable proxy failed!";
+         ERROR_LOG<<"disable proxy failed!";
          return false;
      }
 
@@ -88,11 +89,20 @@ bool  enable_system_socks_proxy()
 }
 int main(int argc, char *argv[])
 {
-    //ConfigManage::instance().load_config("client.json", ConfigManage::Client);
+    QFileInfo file("client.json");
     auto& config = ConfigManage::instance().client_cfg;
-    config.local_addr=LOCAL_PROXY_ADDR;
-    config.local_port = LOCAL_PROXY_PORT;
-    config.user_name = "test_usr";
+    if(file.isFile())
+    {
+        ConfigManage::instance().load_config("client.json", ConfigManage::Client);
+
+    }
+    else
+    {
+        config.local_addr=LOCAL_PROXY_ADDR;
+        config.local_port = LOCAL_PROXY_PORT;
+        config.user_name = "test_usr";
+
+    }
     LogFile logfile_("overplus", 10 * 1024 * 1024);
     //logger::set_log_level(ConfigManage::instance().server_cfg.log_level);
     logger::set_log_destination(Destination::D_FILE);
