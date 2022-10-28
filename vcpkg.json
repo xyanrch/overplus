@@ -2,10 +2,7 @@
   "name": "overplus",
   "version-string": "1.0.2",
   "dependencies": [
-    "boost-json",
-    "boost-iostreams",
-    "boost-asio",
-    "boost-system",
+    "boost",
     "openssl",
     "qt5-base"
   ]

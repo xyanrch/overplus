@@ -14,22 +14,6 @@ stages:
               strip -s overplus
           - publish: $(System.DefaultWorkingDirectory)/overplus
             artifact: LinuxBinary
-      - job: Windows
-        timeoutInMinutes: 120 # how long to run the job before automatically cancelling
-        cancelTimeoutInMinutes: 2 # how much time to give 'run always even if cancelled tasks' before stopping them
-        pool:
-          vmImage: windows-latest
-        steps:
-          - script: git clone https://github.com/microsoft/vcpkg
-            displayName: Checkout vcpkg
-          - script: .\vcpkg\bootstrap-vcpkg.bat
-            displayName: Bootstrap vcpkg
-          - bash: |
-              set -euo pipefail
-              cmake  -A x64 -B . -S .  -DCMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake 
-              cmake --build . --config Release
-          - publish: $(System.DefaultWorkingDirectory)/Release
-            artifact: WindowsBinary
   - stage: Package
     jobs:
       - job: Linux
@@ -51,20 +35,3 @@ stages:
               PIPELINE_WORKSPACE: $(Pipeline.Workspace)
           - publish: $(System.DefaultWorkingDirectory)/overplus-linux-amd64.tar.xz
             artifact: LinuxRelease
-      - job: Windows
-        pool:
-          vmImage: windows-latest
-        steps:
-          - download: current
-            artifact: WindowsBinary
-          - bash: |
-              set -euo pipefail
-              BINARY="$PIPELINE_WORKSPACE/WindowsBinary/"
-              mkdir overplus
-              cp -r "$BINARY" overplus/
-              cp  ConfigTemplate/client.json overplus/.
-              7z a -mx=9 overplus-win.zip overplus
-            env:
-              PIPELINE_WORKSPACE: $(Pipeline.Workspace)
-          - publish: $(System.DefaultWorkingDirectory)/overplus-win.zip
-            artifact: WindowsRelease
