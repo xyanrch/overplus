@@ -11,7 +11,9 @@
 #include <QApplication>
 #include<windows.h>
 #include<stdio.h>
-
+const char*LOCAL_PROXY_ADDR="127.0.0.1";
+const char*LOCAL_PROXY_PORT="1080";
+const char*LOCAL_PROXY_PROTOCOL="socks://127.0.0.1:1080";
 bool  disable_system_socks_proxy()
 {
     HKEY hRoot = HKEY_CURRENT_USER;
@@ -53,8 +55,7 @@ bool  enable_system_socks_proxy()
             REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &hKey, &dwDisposition);
      if (lRet != ERROR_SUCCESS)
             return false;
-     const char*proxy_protocol="socks://127.0.0.1:1080";
-     lRet = RegSetValueEx(hKey, "ProxyServer", 0, REG_SZ, (BYTE*)proxy_protocol, strlen(proxy_protocol));
+     lRet = RegSetValueEx(hKey, "ProxyServer", 0, REG_SZ, (BYTE*)LOCAL_PROXY_PROTOCOL, strlen(LOCAL_PROXY_PROTOCOL));
 
      if (lRet == ERROR_SUCCESS)
      {
@@ -89,8 +90,8 @@ int main(int argc, char *argv[])
 {
     //ConfigManage::instance().load_config("client.json", ConfigManage::Client);
     auto& config = ConfigManage::instance().client_cfg;
-    config.local_addr="127.0.0.1";
-    config.local_port = "1080";
+    config.local_addr=LOCAL_PROXY_ADDR;
+    config.local_port = LOCAL_PROXY_PORT;
     config.user_name = "test_usr";
     LogFile logfile_("overplus", 10 * 1024 * 1024);
     //logger::set_log_level(ConfigManage::instance().server_cfg.log_level);
