@@ -37,16 +37,15 @@ MainWindow::~MainWindow()
      ui->CONNECT_BUTTON->setEnabled(false);
      ui->DISCONNECT_BUTTON->setEnabled(true);
     ui->CONNECTION_STATUS->setText("CONNECTED");
-   if(!ConfigManage::instance().loaded)
-    {
-       auto& config = ConfigManage::instance().client_cfg;
+
+    auto& config = ConfigManage::instance().client_cfg;
     config.remote_addr = ui->HOST_NAME->text().toStdString();
     config.remote_port = ui->HOST_PORT->text().toStdString();
 
     auto psswd = ui->HOST_PASSWD->text().toStdString();
     config.setPassword(psswd);
     NOTICE_LOG<<"Read config frome user input:"<<config.remote_addr<<":"<< config.remote_port<<" password:"<<psswd;
-}
+
     //config.password = ui->
     server.start_accept();
 
