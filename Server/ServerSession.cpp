@@ -92,6 +92,7 @@ void ServerSession::handle_custom_protocol()
                 return;
             }
             if (!vprotocol && trojanReq.command == TrojanReq::UDP_ASSOCIATE) {
+                upstream_udp_buff = trojanReq.payload;
                 handle_trojan_udp_proxy();
 
             } else {
@@ -99,21 +100,36 @@ void ServerSession::handle_custom_protocol()
             }
         });
 }
+void ServerSession::udp_upstream_read()
+{
+    auto self = shared_from_this();
+    upstream_ssl_socket.async_read_some(boost::asio::buffer(in_buf),
+        [this, self](boost::system::error_code ec, std::size_t length) {
+            if (!ec) {
+                upstream_udp_buff += std::string(in_buf.data(), length);
+                handle_trojan_udp_proxy();
 
+            } else {
+                destroy();
+            }
+        });
+}
 void ServerSession::handle_trojan_udp_proxy()
 {
-
     state_ = FORWARD;
     UDPPacket udp_packet;
     size_t packet_len;
-    bool is_packet_valid = udp_packet.parse(trojanReq.payload, packet_len);
+    bool is_packet_valid = udp_packet.parse(upstream_udp_buff, packet_len);
     if (!is_packet_valid) {
-        ERROR_LOG << "parse packet get wrong";
-        // udp_async_bidirectional_read(1);
-        destroy();
+        if (upstream_udp_buff.length() > MAX_BUFF_SIZE) {
+            ERROR_LOG << "parse packet get wrong UDP packet too long";
+            destroy();
+            return;
+        }
+        udp_upstream_read();
         return;
     }
-    upstream_udp_buff = trojanReq.payload.substr(packet_len);
+    upstream_udp_buff = upstream_udp_buff.substr(packet_len);
     DEBUG_LOG << "udp:" << udp_packet.address.address << ":" << udp_packet.address.port;
     auto self = shared_from_this();
     udp_resolver.async_resolve(udp_packet.address.address, std::to_string(udp_packet.address.port), [this, self, udp_packet](const boost::system::error_code error, const udp::resolver::results_type& results) {
@@ -139,13 +155,9 @@ void ServerSession::handle_trojan_udp_proxy()
                 destroy();
                 return;
             }
-            downstream_udp_socket.bind(udp::endpoint(protocol, 0));
-            // udp_async_read();
         }
         udp_async_bidirectional_write(1, udp_packet.payload, iterator);
         udp_async_bidirectional_read(3);
-        // sent_len += packet.length;
-        // udp_async_write(packet.payload, *iterator);
     });
 }
 
@@ -162,8 +174,8 @@ void ServerSession::udp_async_bidirectional_read(int direction)
                     size_t packet_len;
                     upstream_udp_buff += std::string(in_buf.data(), length);
                     bool is_packet_valid = udp_packet.parse(upstream_udp_buff, packet_len);
-                    upstream_udp_buff = upstream_udp_buff.substr(packet_len);
                     if (is_packet_valid) {
+                        upstream_udp_buff = upstream_udp_buff.substr(packet_len);
 
                         udp_resolver.async_resolve(udp_packet.address.address, std::to_string(udp_packet.address.port), [this, self, udp_packet](const boost::system::error_code error, const udp::resolver::results_type& results) {
                             if (error || results.empty()) {
@@ -179,21 +191,15 @@ void ServerSession::udp_async_bidirectional_read(int direction)
                                     break;
                                 }
                             }
-                            if (!downstream_udp_socket.is_open()) {
-                                auto protocol = iterator->endpoint().protocol();
-                                boost::system::error_code ec;
-                                downstream_udp_socket.open(protocol, ec);
-                                if (ec) {
-                                    destroy();
-                                    return;
-                                }
-                                downstream_udp_socket.bind(udp::endpoint(protocol, 0));
-                                // udp_async_read();
-                            }
 
                             udp_async_bidirectional_write(1, udp_packet.payload, iterator);
                         });
                     } else {
+                        if (upstream_udp_buff.length() > MAX_BUFF_SIZE) {
+                            ERROR_LOG << "parse packet get wrong UDP packet too long";
+                            destroy();
+                            return;
+                        }
                         udp_async_bidirectional_read(1);
                     }
 
@@ -415,6 +421,7 @@ void ServerSession::destroy()
 
     boost::system::error_code ec;
     if (downstream_udp_socket.is_open()) {
+        downstream_udp_socket.cancel(ec);
         downstream_udp_socket.close();
     }
     if (downstream_socket.is_open()) {

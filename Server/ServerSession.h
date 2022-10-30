@@ -49,6 +49,7 @@ public:
     void do_resolve();
 
     void do_connect(tcp::resolver::iterator&);
+    void udp_upstream_read();
 
     void async_bidirectional_write(int, size_t);
     void handle_trojan_udp_proxy();
