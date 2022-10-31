@@ -46,4 +46,4 @@ void setLogLevel(Loglevel& level);
     if (logger::get_log_level() <= L_NOTICE) \
     logger(__FILE__, __func__, __LINE__, L_NOTICE).stream()
 #define ERROR_LOG \
-    logger(L_ERROR_EXIT).stream()
+    logger(__FILE__, __func__, __LINE__,L_ERROR_EXIT).stream()

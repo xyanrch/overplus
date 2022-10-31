@@ -42,7 +42,7 @@ ServerSession::ServerSession(boost::asio::io_context& ioctx, boost::asio::ssl::c
 ServerSession::~ServerSession()
 {
     connection_num--;
-    DEBUG_LOG << "Session dectructed, current alive session:" << connection_num.load();
+    DEBUG_LOG << "Session destructed, current alive session:" << connection_num.load();
 }
 void ServerSession::start()
 {
@@ -81,7 +81,7 @@ void ServerSession::handle_custom_protocol()
             if (valid) {
                 //
                 if (!ConfigManage::instance().server_cfg.allowed_passwords.count(password)) {
-                    ERROR_LOG << "Session_num:[" << connection_num.load() << "] unspoorted password from client....,end session";
+                    ERROR_LOG << "Session_num:[" << connection_num.load() << "] unsupported password from client....,end session";
                     destroy();
                     return;
                 }
@@ -156,8 +156,21 @@ void ServerSession::handle_trojan_udp_proxy()
                 return;
             }
         }
-        udp_async_bidirectional_write(1, udp_packet.payload, iterator);
-        udp_async_bidirectional_read(3);
+        downstream_udp_socket.async_send_to(boost::asio::buffer(udp_packet.payload), *iterator,
+            [this, self](boost::system::error_code ec, std::size_t length) {
+                if (!ec)
+                    udp_async_bidirectional_read(3);
+                else {
+                    if (ec != boost::asio::error::operation_aborted) {
+                        ERROR_LOG << "Session_num:[" << connection_num.load() << "] closing session. Client socket write error" << ec.message();
+                    }
+                    // Most probably client closed socket. Let's close both sockets and exit session.
+                    destroy();
+                    return;
+                }
+            });
+        //udp_async_bidirectional_write(1, udp_packet.payload, iterator);
+
     });
 }
 
@@ -318,7 +331,7 @@ void ServerSession::do_connect(tcp::resolver::iterator& it)
                             }
                         });
                 }
-                // read packet from both dirction
+                // read packet from both direction
                 else
                     async_bidirectional_read(3);
 
