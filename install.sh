@@ -185,12 +185,12 @@ start_menu(){
     
     green " ======================================="
     echo
-    green " 1. 安装overplus"
-    red " 2. 卸载overplus"
+    green " 1. Install overplus"
+    red " 2. Remove overplus"
     
-    blue " 0. 退出脚本"
+    blue " 0. Exit"
     echo
-    read -p "请输入数字:" num
+    read -p "Please input number:" num
     case "$num" in
         1)
             install_overplus
@@ -203,7 +203,7 @@ start_menu(){
         ;;
         *)
             clear
-            red "请输入正确数字"
+            red "Please input correct number"
             sleep 1s
             start_menu
         ;;

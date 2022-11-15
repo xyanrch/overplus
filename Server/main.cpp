@@ -15,15 +15,17 @@ int main(int argc, char* argv[])
     }
     auto& config = ConfigManage::instance();
     config.load_config(argv[1], ConfigManage::Server);
+    std::unique_ptr<LogFile>logfile_;
+
+    logger::set_log_level(config.server_cfg.log_level);
     if (!config.server_cfg.log_dir.empty()) {
-        LogFile logfile_("server", 10 * 1024 * 1024);
-        logger::set_log_level(ConfigManage::instance().server_cfg.log_level);
+        logfile_.reset(new LogFile("server", 10 * 1024 * 1024));
         logger::set_log_destination(Destination::D_FILE);
         logger::setOutput([&](std::string&& buf) {
-            logfile_.append(std::move(buf));
+            logfile_->append(std::move(buf));
         });
         logger::setFlush([&]() {
-            logfile_.flush();
+            logfile_->flush();
         });
     }
     try {
