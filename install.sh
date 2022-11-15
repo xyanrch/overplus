@@ -181,7 +181,7 @@ function remove_overplus(){
 start_menu(){
     clear
     green " ===================================="
-    green "  Welcome to the OpenVPN installer!      "
+    green "  Welcome to the overplus installer!      "
     
     green " ======================================="
     echo

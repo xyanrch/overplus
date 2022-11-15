@@ -1,13 +1,12 @@
 # overplus
-Overplus is another implement of trojan protocol with better perfermance and stability.
+Overplus is another implementation of trojan protocol with better perfermance and stability.
 
 [![Azure DevOps Status](https://dev.azure.com/overplusProxy/overplus/_apis/build/status/xyanrch.overplus?branchName=master)](https://dev.azure.com/overplusProxy/overplus/_build/latest?definitionId=3&branchName=master)
 
 **Compared with trojan**:
 - [x] Lower latency and higher speed
 - [x] Enhanced Security
-- [x] It doesn't need to set up a http server on port 80 in your linux server.
-- [x] It doesn't need to apply a domain name.
+- [x] Easy to deploy
 - [x] More readable and cleaner code.
 
 
