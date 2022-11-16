@@ -15,15 +15,16 @@ if (WIN32)
             mainwindow.h
             mainwindow.ui
             )
+ 
+
     add_executable(overplus_client main.cpp ${SRCS})
+    target_link_libraries(overplus_client Threads::Threads shared proto OpenSSL::SSL
+            Qt5::Core Qt5::Gui Qt5::Widgets ${Boost_LIBRARIES} wsock32 ws2_32 crypt32)
     set_target_properties(overplus_client PROPERTIES
             MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
             MACOSX_BUNDLE TRUE
             WIN32_EXECUTABLE TRUE
             )
-    add_executable(overplus_client main.cpp ${SRCS})
-    target_link_libraries(overplus_client Threads::Threads shared proto OpenSSL::SSL
-            Qt5::Core Qt5::Gui Qt5::Widgets ${Boost_LIBRARIES} wsock32 ws2_32 crypt32)
 else ()
     set(SRCS
             Server.h
