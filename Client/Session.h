@@ -32,7 +32,7 @@ public:
     void do_connect(tcp::resolver::iterator&);
     void write_socks5_response();
     void write_packet(int, size_t);
-    void do_sent_v_req(;
+    void do_sent_v_req();
     void do_ssl_handshake();
     void destroy();
 

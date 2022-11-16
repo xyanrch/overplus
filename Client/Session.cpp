@@ -92,8 +92,8 @@ void Session::read_socks5_request()
                     destroy();
                     return;
                 }
-                NOTICE_LOG<<"Receive socks5 message "<<req;
-                if(req.cmd == Request::UDP_ASSOCIATE)
+                NOTICE_LOG<<"Receive socks5 message "<<socks5_req;
+                if(socks5_req.cmd == Request::UDP_ASSOCIATE)
                 {
                   // do_handle_socks_udp_associate();
                 }
@@ -160,7 +160,7 @@ void Session::do_sent_v_req()
 
     request.user_name = config.user_name;
     request.password = config.password;
-    request.address = socks5_reqremote_host;
+    request.address = socks5_req.remote_host;
     request.port = socks5_req.remote_port;
     request.stream(message_buf);
     DEBUG_LOG<<" v protocol send buf:"<<message_buf;
