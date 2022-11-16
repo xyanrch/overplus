@@ -87,14 +87,20 @@ void Session::read_socks5_request()
     in_socket.async_read_some(boost::asio::buffer(in_buf),
         [this, self](boost::system::error_code ec, std::size_t length) {
             if (!ec) {
-                Request req;
-                if (!req.unsteam(in_buf, length)) {
+                if (!socks5_req.unsteam(in_buf, length)) {
                     ERROR_LOG << "decode mesage error";
                     destroy();
                     return;
                 }
                 NOTICE_LOG<<"Receive socks5 message "<<req;
-                do_resolve(req);
+                if(req.cmd == Request::UDP_ASSOCIATE)
+                {
+                  // do_handle_socks_udp_associate();
+                }
+                else
+                {
+                    do_resolve();
+                }
             } else {
                 ERROR_LOG << "SOCKS5 request read:" << ec.message();
                 destroy();
@@ -103,47 +109,47 @@ void Session::read_socks5_request()
         });
 }
 
-void Session::do_resolve(const Request& req)
+void Session::do_resolve()
 {
     auto self(shared_from_this());
     resolver_.async_resolve(tcp::resolver::query(remote_host, remote_port),
-        [req, this, self](const boost::system::error_code& ec, tcp::resolver::iterator it) {
+        [this, self](const boost::system::error_code& ec, tcp::resolver::iterator it) {
             if (!ec) {
-                do_connect(it, req);
+                do_connect(it);
             } else {
                 ERROR_LOG << "failed to resolve " << remote_host << ":" << remote_port << " " << ec.message();
                 destroy();
             }
         });
 }
-void Session::do_connect(tcp::resolver::iterator& it, const Request& req)
+void Session::do_connect(tcp::resolver::iterator& it)
 {
     auto self(shared_from_this());
     //
     out_socket.lowest_layer().async_connect(*it,
-        [req, this, self](const boost::system::error_code& ec) {
+        [ this, self](const boost::system::error_code& ec) {
             if (!ec) {
                 DEBUG_LOG << "connected to " << remote_host << ":" << remote_port;
-                do_ssl_handshake(req);
+                do_ssl_handshake();
             } else {
                 ERROR_LOG << "failed to connect " << remote_host << ":" << remote_port << " " << ec.message();
                 destroy();
             }
         });
 }
-void Session::do_ssl_handshake(const Request& req)
+void Session::do_ssl_handshake()
 {
     auto self(shared_from_this());
-    out_socket.async_handshake(boost::asio::ssl::stream_base::client, [req, this, self](const boost::system::error_code& error) {
+    out_socket.async_handshake(boost::asio::ssl::stream_base::client, [this, self](const boost::system::error_code& error) {
         if (!error) {
-            do_sent_v_req(req);
+            do_sent_v_req();
         } else {
             ERROR_LOG << "ssl handshake failed :" << error.message();
             destroy();
         }
     });
 }
-void Session::do_sent_v_req(const Request& req)
+void Session::do_sent_v_req()
 {
     auto self(shared_from_this());
     message_buf.clear();
@@ -154,8 +160,8 @@ void Session::do_sent_v_req(const Request& req)
 
     request.user_name = config.user_name;
     request.password = config.password;
-    request.address = req.remote_host;
-    request.port = req.remote_port;
+    request.address = socks5_reqremote_host;
+    request.port = socks5_req.remote_port;
     request.stream(message_buf);
     DEBUG_LOG<<" v protocol send buf:"<<message_buf;
 

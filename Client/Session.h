@@ -28,12 +28,12 @@ public:
     void read_packet(int);
     void write_sock5_hanshake_reply(AuthReq& req);
     void read_socks5_request();
-    void do_resolve(const Request& req);
-    void do_connect(tcp::resolver::iterator&, const Request& req);
+    void do_resolve();
+    void do_connect(tcp::resolver::iterator&);
     void write_socks5_response();
     void write_packet(int, size_t);
-    void do_sent_v_req(const Request& req);
-    void do_ssl_handshake(const Request& req);
+    void do_sent_v_req(;
+    void do_ssl_handshake();
     void destroy();
 
 private:
@@ -50,6 +50,7 @@ private:
     std::vector<char> in_buf;
     std::vector<char> out_buf;
     std::string message_buf;
+    Request socks5_req;
     State state_ { HANDSHAKE };
     boost::asio::ssl::context& ssl_ctx;
     boost::asio::ssl::stream<boost::asio::ip::tcp::socket> out_socket;
