@@ -77,6 +77,7 @@ function generate_certifiate(){
     chmod 644 /etc/overplus/crl.pem
 }
 function install_overplus(){
+    $systemPackage -y install openssl
     $systemPackage -y install  xz-utils  wget unzip zip curl tar
     Port443=`netstat -tlpn | awk -F '[: ]+' '$1=="tcp"{print $5}' | grep -w 443`
     if [ -n "$Port443" ]; then
