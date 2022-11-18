@@ -48,7 +48,7 @@ fi
 function generate_certifiate(){
     # Install the latest version of easy-rsa from source, if not already installed.
     if [ ! -d "/etc/overplus/easy-rsa" ]; then
-        local version="3.0.7"
+        local version="3.1.1"
         wget -O ~/easy-rsa.tgz https://github.com/OpenVPN/easy-rsa/releases/download/v${version}/EasyRSA-${version}.tgz
         mkdir -p /etc/overplus/easy-rsa
         tar xzf ~/easy-rsa.tgz --strip-components=1 --directory /etc/overplus/easy-rsa
@@ -77,8 +77,7 @@ function generate_certifiate(){
     chmod 644 /etc/overplus/crl.pem
 }
 function install_overplus(){
-    $systemPackage -y install net-tools socat
-    $systemPackage -y install  xz-utils  wget unzip zip curl tar >/dev/null 2>&1
+    $systemPackage -y install  xz-utils  wget unzip zip curl tar
     Port443=`netstat -tlpn | awk -F '[: ]+' '$1=="tcp"{print $5}' | grep -w 443`
     if [ -n "$Port443" ]; then
         process443=`netstat -tlpn | awk -F '[: ]+' '$5=="443"{print $9}'`
