@@ -61,10 +61,10 @@ function generate_certifiate(){
         SERVER_NAME="server_$(head /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)"
         echo "$SERVER_NAME" >SERVER_NAME_GENERATED
         # Create the PKI, set up the CA, the DH params and the server certificate
-        ./easyrsa init-pki
+        ./easyrsa --batch init-pki
         ./easyrsa --batch build-ca nopass
-        ./easyrsa  build-server-full "$SERVER_NAME" nopass
-        EASYRSA_CRL_DAYS=3650 ./easyrsa gen-crl
+        ./easyrsa --batch --days=3650 build-server-full "$SERVER_NAME" nopass
+        ./easyrsa --batch --days=3650 gen-crl
     else
         # If easy-rsa is already installed, grab the generated SERVER_NAME
         # for client configs
