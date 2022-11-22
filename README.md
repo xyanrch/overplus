@@ -85,7 +85,7 @@ Trojan protocol is a socks5 like protocol.Trojan request is formed as follows:
 ![flow chart](asset/flow.png)
 
  ## Client side 
- A widows client that support v protocol can find in release page. Overplus fully support trojan protocol, So it is Ok to use trojan's client. Please make sure disable certificate verification if you use a self issued certificate.
+ A windows client that support v protocol can find in release page. Overplus fully support trojan protocol, So it is Ok to use trojan's client. Please make sure disable certificate verification if you use a self issued certificate.
 
 
 ## Roadmap
