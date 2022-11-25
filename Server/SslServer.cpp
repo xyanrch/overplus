@@ -23,21 +23,41 @@ SslServer::SslServer()
     acceptor_.set_option(tcp::acceptor::reuse_address(true));
     acceptor_.bind(endpoint);
     acceptor_.listen();
-    do_accept();
+    if(config_manage.server_cfg.websocketEnabled)
+    {
+        NOTICE_LOG<<"listen websocket connection";
+        do_websocket_accept();
+    }
+    else
+    {
+        do_accept();
+    }
+
+}
+void SslServer::do_websocket_accept()
+{
+    websocket_connection_.reset(new WebsocketSession(context_pool.get_io_context(), ssl_context_));
+    acceptor_.async_accept(websocket_connection_->socket(), [this](const boost::system::error_code &ec) {
+        if(!ec){
+            auto ep = websocket_connection_->socket().remote_endpoint();
+            NOTICE_LOG << "accept incoming connection :" << ep.address().to_string();
+            websocket_connection_->start();
+        }
+        else
+        {
+            NOTICE_LOG << "accept incoming connection fail:" << ec.message() << std::endl;
+
+        }
+        do_websocket_accept();
+
+});
+
+
+
 }
 
 void SslServer::load_server_certificate(boost::asio::ssl::context &ctx) {
 
-    /*            // passphrase from the privatekey
-            ctx.set_password_callback(
-          [](std::size_t,
-              boost::asio::ssl::context_base::password_purpose) {
-              return "test";
-          });
-    // ctx.use_tmp_dh(
-    //   boost::asio::buffer(dh.data(), dh.size()));
-
-  */
     auto &config_manage = ConfigManage::instance();
 
     ctx.set_options(
@@ -49,15 +69,7 @@ void SslServer::load_server_certificate(boost::asio::ssl::context &ctx) {
     ssl_context_.use_private_key_file(config_manage.server_cfg.server_private_key, boost::asio::ssl::context::pem);
 }
 
-/*static void dump_current_open_fd()
-{
 
-    std::string path = "/proc/" + std::to_string(::getpid()) + "/fd/";
-    // unsigned count = std::distance(std::filesystem::directory_iterator(path),
-    //    std::filesystem::directory_iterator());
-
-    //  NOTICE_LOG << "Current open fd count:" << count;
-}*/
 void SslServer::do_accept() {
     new_connection_.reset(new ServerSession(context_pool.get_io_context(), ssl_context_));
     acceptor_.async_accept(new_connection_->socket(), [this](const boost::system::error_code &ec) {
@@ -80,10 +92,8 @@ void SslServer::do_accept() {
             boost::system::error_code error;
             auto ep = new_connection_->socket().remote_endpoint(error);
             if (!error) {
-                DEBUG_LOG << "Session_num:[" << ServerSession::connection_num.load() << "] accept incoming connection :"
-                          << ep.address().to_string();
-                boost::asio::socket_base::keep_alive option(true);
-                new_connection_->socket().set_option(option);
+                DEBUG_LOG << "accept incoming connection :" << ep.address().to_string();
+                new_connection_->socket().set_option(boost::asio::socket_base::keep_alive(true));
                 new_connection_->start();
 
             } else {
@@ -114,6 +124,7 @@ void SslServer::add_signals() {
 #endif
     signals.async_wait([this](const boost::system::error_code &ec, int sig) {
         // dump_current_open_fd();
+        acceptor_.cancel();
         context_pool.stop();
 
         NOTICE_LOG << "Recieve signal:" << sig << " SslServer stopped..." << std::endl;

@@ -1,5 +1,6 @@
 #pragma once
 #include "ServerSession.h"
+#include "websocketSession.h"
 #include <Shared/ConfigManage.h>
 #include <Shared/IoContextPool.h>
 #include <Shared/Log.h>
@@ -19,6 +20,7 @@ public:
 private:
     void add_signals();
     void do_accept();
+    void do_websocket_accept();
     void load_server_certificate(boost::asio::ssl::context& ctx);
 
 private:
@@ -31,4 +33,5 @@ private:
     boost::asio::ssl::context ssl_context_;
 public: 
     std::shared_ptr<ServerSession> new_connection_;
+    std::shared_ptr<WebsocketSession> websocket_connection_;
 };
