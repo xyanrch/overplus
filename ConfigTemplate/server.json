@@ -10,5 +10,6 @@
     "ssl": {
         "cert": "VAR_SERVER_CERT",
         "key": "VAR_SERVER_KEY"
-    }
+    },
+    "websocketEnabled": false
 }
