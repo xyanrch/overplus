@@ -32,6 +32,8 @@ struct ServerConfig {
     std::string certificate_chain;
     std::string server_private_key;
     //
+    //websocket
+    bool websocketEnabled;
     void populate(boost::property_tree::ptree&);
 };
 struct ClientConfig {
@@ -57,6 +59,7 @@ struct ClientConfig {
     std::string password;
     std::string user_name;
     std::string text_password;
+
     void populate(boost::property_tree::ptree&);
     void setPassword(std::string&psswd);
 

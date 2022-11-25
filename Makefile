@@ -1,6 +1,6 @@
 
 DOCKER_DEPS_IMAGE_BUILD_FLAGS?=--no-cache=true
-
+PWD := $(shell pwd)
 
 gen_cmake:
 	docker run -it --init --rm --memory-swap=-1 --ulimit core=-1 --name="overplus" \
@@ -15,7 +15,7 @@ gen_cmake:
 build: gen_cmake
 	docker run -it --init --rm --memory-swap=-1 --ulimit core=-1  --name="overplus" \
          --workdir=/src \
-         --mount type=bind,source=${PWD},target=/src \
+         --mount type=bind,source="${PWD}",target=/src \
          yanrongdocker/overplus_build_base:latest \
          bash -c \
         "cd build && \

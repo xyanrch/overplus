@@ -2,11 +2,11 @@ cmake_minimum_required(VERSION 3.5)
 project(overplus)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-
+#set(OPENSSL_USE_STATIC_LIBS TRUE)
 #add_definitions(-Wall)
 #add_compile_options(-fsanitize=address)
 #add_link_options(-fsanitize=address)
-add_compile_options(-DBOOST_ASIO_CONCURRENCY_HINT_1=BOOST_ASIO_CONCURRENCY_HINT_UNSAFE)
+add_compile_options(-DBOOST_ASIO_CONCURRENCY_HINT_1=BOOST_ASIO_CONCURRENCY_HINT_UNSAFE_IO)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 #set(Boost_USE_STATIC_LIBS on)
 include_directories(.)
@@ -28,7 +28,7 @@ add_subdirectory(Client)
 add_executable(overplus Server/main.cpp)
 target_link_libraries(overplus Threads::Threads  shared server proto OpenSSL::SSL)
 target_link_libraries(overplus ${Boost_LIBRARIES})
-##generate client binary code
+
 
 
 

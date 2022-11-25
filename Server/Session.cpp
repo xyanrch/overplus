@@ -1,13 +1,13 @@
-#include"Session.h"
+#include "Session.h"
 #include "Protocol/UDPPacket.h"
 #include "Shared/ConfigManage.h"
 #include "Shared/Log.h"
 #include <chrono>
 #include <cstring>
 #include <string>
-template <class T>
-Session<T>::Session(boost::asio::io_context& ioctx, boost::asio::ssl::context& sslctx,Session::Type type)
-    
+template<class T>
+Session<T>::Session(boost::asio::io_context& ioctx, boost::asio::ssl::context& sslctx, Session::Type type)
+
     : io_context_(ioctx)
     , upstream_ssl_socket(ioctx, sslctx)
     , downstream_socket(ioctx)
@@ -16,11 +16,11 @@ Session<T>::Session(boost::asio::io_context& ioctx, boost::asio::ssl::context& s
     , downstream_udp_socket(ioctx)
     , in_buf(MAX_BUFF_SIZE)
     , out_buf(MAX_BUFF_SIZE)
-   , session_type(type)
+    , session_type(type)
 
 {
 }
-template <class T>
+template<class T>
 void Session<T>::handle_custom_protocol()
 {
     auto self = this->shared_from_this();
@@ -34,7 +34,7 @@ void Session<T>::handle_custom_protocol()
             }
             bool valid = false;
             if (VRequest::is_v_protocol(in_buf)) {
-                
+
                 valid = v_req.unstream(std::string(in_buf.data(), length));
                 password = v_req.password;
                 vprotocol = true;
@@ -65,7 +65,7 @@ void Session<T>::handle_custom_protocol()
             }
         });
 }
-template <class T>
+template<class T>
 void Session<T>::udp_upstream_read()
 {
     auto self = this->shared_from_this();
@@ -80,7 +80,7 @@ void Session<T>::udp_upstream_read()
             }
         });
 }
-template <class T>
+template<class T>
 void Session<T>::handle_trojan_udp_proxy()
 {
     state_ = FORWARD;
@@ -139,7 +139,7 @@ void Session<T>::handle_trojan_udp_proxy()
         // udp_async_bidirectional_write(1, udp_packet.payload, iterator);
     });
 }
-template <class T>
+template<class T>
 void Session<T>::udp_async_bidirectional_read(int direction)
 {
     auto self = this->shared_from_this();
@@ -217,7 +217,7 @@ void Session<T>::udp_async_bidirectional_read(int direction)
             });
     }
 }
-template <class T>
+template<class T>
 void Session<T>::udp_async_bidirectional_write(int direction, const std::string& packet, boost::asio::ip::udp::resolver::iterator udp_ep)
 {
     auto self(this->shared_from_this());
@@ -239,23 +239,11 @@ void Session<T>::udp_async_bidirectional_write(int direction, const std::string&
             });
         break;
     case 2:
-        upstream_ssl_socket.async_write(boost::asio::buffer(packet),
-            [this, self, direction](boost::system::error_code ec, std::size_t length) {
-                if (!ec)
-                    udp_async_bidirectional_read(direction);
-                else {
-                    if (ec != boost::asio::error::operation_aborted) {
-                        ERROR_LOG << " closing session. Remote socket write error", ec.message();
-                    }
-                    // Most probably remote server closed socket. Let's close both sockets and exit session.
-                    destroy();
-                    return;
-                }
-            });
+        upstream_udp_write(direction, packet);
         break;
     }
 }
-template <class T>
+template<class T>
 void Session<T>::do_resolve()
 {
     auto self(this->shared_from_this());
@@ -271,7 +259,7 @@ void Session<T>::do_resolve()
             }
         });
 }
-template <class T>
+template<class T>
 void Session<T>::do_connect(tcp::resolver::iterator& it)
 {
     auto self(this->shared_from_this());
@@ -308,7 +296,7 @@ void Session<T>::do_connect(tcp::resolver::iterator& it)
             }
         });
 }
-template <class T>
+template<class T>
 void Session<T>::async_bidirectional_read(int direction)
 {
     auto self = this->shared_from_this();
@@ -352,7 +340,7 @@ void Session<T>::async_bidirectional_read(int direction)
                 }
             });
 }
-template <class T>
+template<class T>
 void Session<T>::async_bidirectional_write(int direction, size_t len)
 {
     auto self(this->shared_from_this());
@@ -374,29 +362,24 @@ void Session<T>::async_bidirectional_write(int direction, size_t len)
             });
         break;
     case 2:
-        upstream_ssl_socket.async_write(boost::asio::buffer(out_buf, len), [this, self, direction](boost::system::error_code ec, std::size_t length) {
-            if (!ec)
-                async_bidirectional_read(direction);
-            else {
-                if (ec != boost::asio::error::operation_aborted) {
-                    ERROR_LOG << " closing session. Remote socket write error", ec.message();
-                }
-                // Most probably remote server closed socket. Let's close both sockets and exit session.
-                destroy();
-                return;
-            }
-        });
+        upstream_tcp_write(direction, len);
         break;
     }
 }
-template <class T>
+
+template<class T>
+void Session<T>::upstream_tcp_write(int direction, size_t len)
+{
+    assert(0);
+}
+template<class T>
+void Session<T>::upstream_udp_write(int direction, const std::string& packet)
+{
+    assert(0);
+}
+template<class T>
 void Session<T>::destroy()
 {
-    if (state_ == DESTROY) {
-        return;
-    }
-    state_ = DESTROY;
-
     boost::system::error_code ec;
     if (downstream_udp_socket.is_open()) {
         downstream_udp_socket.cancel(ec);
@@ -407,10 +390,4 @@ void Session<T>::destroy()
         downstream_socket.cancel();
         downstream_socket.close();
     }
-    //for websocket don't close
-  /*  if (session_type == TCP && upstream_ssl_socket.lowest_layer().is_open()) {
-        upstream_ssl_socket.lowest_layer().cancel(ec);
-        upstream_ssl_socket.lowest_layer().shutdown(tcp::socket::shutdown_both, ec);
-        upstream_ssl_socket.lowest_layer().close(ec);
-    }*/
 }

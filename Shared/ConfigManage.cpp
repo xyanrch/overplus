@@ -101,4 +101,5 @@ void ServerConfig::populate(boost::property_tree::ptree& tree)
 
     certificate_chain = tree.get("ssl.cert", std::string());
     server_private_key = tree.get("ssl.key", std::string());
+    websocketEnabled = tree.get("websocketEnabled",false);
 }

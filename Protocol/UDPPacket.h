@@ -2,6 +2,7 @@
 #include "TrojanReq.h"
 class UDPPacket {
 public:
+    UDPPacket(){}
     SOCKS5Address address;
     uint16_t length;
     std::string payload;
