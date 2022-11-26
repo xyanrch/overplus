@@ -129,7 +129,7 @@ void Session<T>::handle_trojan_udp_proxy()
                     udp_async_bidirectional_read(3);
                 else {
                     if (ec != boost::asio::error::operation_aborted) {
-                        ERROR_LOG << " closing session. Client socket write error" << ec.message();
+                        ERROR_LOG << "Server-->RemoteWeb(udp):" << ec.message();
                     }
                     // Most probably client closed socket. Let's close both sockets and exit session.
                     destroy();
@@ -185,7 +185,7 @@ void Session<T>::udp_async_bidirectional_read(int direction)
                 } else // if (ec != boost::asio::error::eof)
                 {
                     if (ec != boost::asio::error::eof && ec != boost::asio::error::operation_aborted) {
-                        ERROR_LOG << "closing session. Client socket read error: " << ec.message();
+                        ERROR_LOG << "client-->Server(UDP over tls) " << ec.message();
                     }
 
                     // Most probably client closed socket. Let's close both sockets and exit session.
@@ -207,7 +207,7 @@ void Session<T>::udp_async_bidirectional_read(int direction)
                 } else // if (ec != boost::asio::error::eof)
                 {
                     if (ec != boost::asio::error::eof && ec != boost::asio::error::operation_aborted) {
-                        ERROR_LOG << "closing session. Remote socket read error: " << ec.message();
+                        ERROR_LOG << "Server<--RemoteWeb(udp): " << ec.message();
                     }
 
                     // Most probably remote server closed socket. Let's close both sockets and exit session.
@@ -230,7 +230,7 @@ void Session<T>::udp_async_bidirectional_write(int direction, const std::string&
                     udp_async_bidirectional_read(direction);
                 else {
                     if (ec != boost::asio::error::operation_aborted) {
-                        ERROR_LOG << " closing session. Client socket write error" << ec.message();
+                        ERROR_LOG << "Server-->RemoteWeb(udp):" << ec.message();
                     }
                     // Most probably client closed socket. Let's close both sockets and exit session.
                     destroy();
@@ -279,7 +279,7 @@ void Session<T>::do_connect(tcp::resolver::iterator& it)
                             if (!ec)
                                 async_bidirectional_read(3);
                             else {
-                                ERROR_LOG << "closing session. Client socket write error" << ec.message();
+                                ERROR_LOG << "Client<--Server:" << ec.message();
                                 // Most probably client closed socket. Let's close both sockets and exit session.
                                 destroy();
                                 return;
@@ -311,7 +311,7 @@ void Session<T>::async_bidirectional_read(int direction)
                 } else // if (ec != boost::asio::error::eof)
                 {
                     if (ec != boost::asio::error::eof && ec != boost::asio::error::operation_aborted) {
-                        ERROR_LOG << "closing session. Client socket read error: " << ec.message();
+                        ERROR_LOG << "Client-->Server: " << ec.message();
                     }
 
                     // Most probably client closed socket. Let's close both sockets and exit session.
@@ -331,7 +331,7 @@ void Session<T>::async_bidirectional_read(int direction)
                 } else // if (ec != boost::asio::error::eof)
                 {
                     if (ec != boost::asio::error::eof && ec != boost::asio::error::operation_aborted) {
-                        ERROR_LOG << "closing session. Remote socket read error: " << ec.message();
+                        ERROR_LOG << "Server<--RemoteWeb: " << ec.message();
                     }
 
                     // Most probably remote server closed socket. Let's close both sockets and exit session.
@@ -353,7 +353,7 @@ void Session<T>::async_bidirectional_write(int direction, size_t len)
                     async_bidirectional_read(direction);
                 else {
                     if (ec != boost::asio::error::operation_aborted) {
-                        ERROR_LOG << " closing session. Client socket write error" << ec.message();
+                        ERROR_LOG << " Client-->Server" << ec.message();
                     }
                     // Most probably client closed socket. Let's close both sockets and exit session.
                     destroy();

@@ -54,7 +54,7 @@ void TlsSession::upstream_tcp_write(int direction, size_t len)
             async_bidirectional_read(direction);
         else {
             if (ec != boost::asio::error::operation_aborted) {
-                ERROR_LOG << " closing session. Remote socket write error"<< ec.message();
+                ERROR_LOG << "Client<--Server(TCP)"<< ec.message();
             }
             // Most probably remote server closed socket. Let's close both sockets and exit session.
             destroy();
@@ -72,7 +72,7 @@ void TlsSession::upstream_udp_write(int direction, const std::string& packet)
                 udp_async_bidirectional_read(direction);
             else {
                 if (ec != boost::asio::error::operation_aborted) {
-                    ERROR_LOG << " closing session. Remote socket write error:"<< ec.message();
+                    ERROR_LOG << "Client<--Server(UDP over tls)"<< ec.message();
                 }
                 // Most probably remote server closed socket. Let's close both sockets and exit session.
                 destroy();

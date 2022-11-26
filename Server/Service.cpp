@@ -51,9 +51,6 @@ void Service::do_websocket_accept()
         do_websocket_accept();
 
 });
-
-
-
 }
 
 void Service::load_server_certificate(boost::asio::ssl::context &ctx) {
@@ -102,8 +99,7 @@ void Service::do_accept() {
             }
         } else {
             // dump_current_open_fd();
-            NOTICE_LOG << "Session_num:[" << TlsSession::connection_num.load()
-                       << "] accept incoming connection fail:" << ec.message() << std::endl;
+            NOTICE_LOG << "accept incoming connection fail:" << ec.message() << std::endl;
             clean_up();
         }
 
@@ -124,7 +120,6 @@ void Service::add_signals() {
 #endif
     signals.async_wait([this](const boost::system::error_code &ec, int sig) {
         // dump_current_open_fd();
-        acceptor_.cancel();
         context_pool.stop();
 
         NOTICE_LOG << "Recieve signal:" << sig << " SslServer stopped..." << std::endl;

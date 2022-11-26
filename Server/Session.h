@@ -73,26 +73,25 @@ public:
 
 protected:
     static constexpr size_t MAX_BUFF_SIZE = 8192;
-    // SSLSocket ssl_socket;
     boost::asio::io_context& io_context_;
     T upstream_socket;
-
     tcp::socket downstream_socket;
-    //
-    std::string remote_host;
-    std::string remote_port;
+
     //
     tcp::resolver resolver_;
     udp::resolver udp_resolver;
-    udp::socket downstream_udp_socket;
-    //
-    std::vector<char> in_buf;
-    std::vector<char> out_buf;
+    udp::socket downstream_udp_socket;    //
+
     State state_ { HANDSHAKE };
     TrojanReq trojanReq {};
     VRequest v_req {};
     std::string password;
     std::string upstream_udp_buff;
+    //
+    std::vector<char> in_buf;
+    std::vector<char> out_buf;
+    std::string remote_host;
+    std::string remote_port;
     bool vprotocol = false;
     Type session_type;
 

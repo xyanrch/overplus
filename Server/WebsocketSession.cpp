@@ -38,8 +38,7 @@ void WebsocketSession::on_handshake(beast::error_code ec)
     // Set a decorator to change the Server of the handshake
     upstream_socket.set_option(websocket::stream_base::decorator(
         [](websocket::response_type& res) {
-            res.set(http::field::server,
-                std::string(BOOST_BEAST_VERSION_STRING) + " websocket-server-async-ssl");
+            res.set(http::field::server,"overplus websocket-server");
         }));
 
     // Accept the websocket handshake
@@ -66,7 +65,7 @@ void WebsocketSession::upstream_tcp_write(int direction, size_t len)
             async_bidirectional_read(direction);
         else {
             if (ec != boost::asio::error::operation_aborted) {
-                NOTICE_LOG << "upstream socket TCP write:" <<ec.message();
+                NOTICE_LOG << "Client<--Server(TCP):" <<ec.message();
             }
             destroy();
             return;
@@ -83,7 +82,7 @@ void WebsocketSession::upstream_udp_write(int direction, const std::string& pack
                 udp_async_bidirectional_read(direction);
             else {
                 if (ec != boost::asio::error::operation_aborted) {
-                    NOTICE_LOG << "upstream socket udp write:" << ec.message();
+                    NOTICE_LOG << "Client<--Server(UDP over tls)" << ec.message();
                 }
                 destroy();
                 return;
@@ -97,5 +96,4 @@ void WebsocketSession::destroy()
     }
     state_ = DESTROY;
     Session<websocket::stream<beast::ssl_stream<beast::tcp_stream>>>::destroy();
-
 }
