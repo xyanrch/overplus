@@ -18,7 +18,4 @@ public:
     virtual void upstream_udp_write(int direction, const std::string& packet);
     virtual void destroy();
 
-public:
-    static std::atomic<uint32_t> connection_num;
-
 };

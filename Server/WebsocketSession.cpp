@@ -1,11 +1,9 @@
 #include "WebsocketSession.h"
 #include "Shared/ConfigManage.h"
 #include "Shared/Log.h"
-std::atomic<uint32_t> WebsocketSession::connection_num(0);
 WebsocketSession::WebsocketSession(boost::asio::io_context& io_ctx, boost::asio::ssl::context& ssl_ctx)
 : Session<websocket::stream<beast::ssl_stream<beast::tcp_stream>>>(io_ctx,ssl_ctx,Session::WEBSOCKET)
 {
-    connection_num++;
 }
 void WebsocketSession::start()
 {

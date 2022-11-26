@@ -17,16 +17,12 @@
 //                <--- downstream <---
 #include "TlsSession.h"
 
-std::atomic<uint32_t> TlsSession::connection_num(0);
 TlsSession::TlsSession(boost::asio::io_context& ioctx, boost::asio::ssl::context& sslctx)
     : Session<SSLSocket>(ioctx, sslctx, Session::TCP)
 {
-    connection_num++;
 }
 TlsSession::~TlsSession()
 {
-    connection_num--;
-    NOTICE_LOG << "Session destructed, current alive session:" << connection_num.load();
 }
 void TlsSession::start()
 {
