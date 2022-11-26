@@ -2,7 +2,7 @@ message(STATUS "Enter Server CMakeList ...")
 
 set(SRCS
         TlsSession.cpp
-        websocketSession.cpp
+        WebsocketSession.cpp
         Service.cpp
         )
 add_library(server ${SRCS})
