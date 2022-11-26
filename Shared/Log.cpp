@@ -78,11 +78,11 @@ logger::logger(Loglevel level)
 logger::Impl::Impl(const char* file, const char* func, int line, Loglevel level)
 {
     if (log_dest == D_STDOUT) {
-        log_stream_ << get_format_time() << ANSI_COLOR_GREEN << level_str[level] << ANSI_COLOR_RESET << file << " " << func << ": line: " << line << " ";
+        log_stream_ << get_format_time() << ANSI_COLOR_GREEN << level_str[level] << ANSI_COLOR_RESET << file << " line: " << line << " ";
     } else {
-        log_stream_ << get_format_time() << level_str[level] << file << " " << func << ": line: " << line << " ";
+        log_stream_ << get_format_time() << level_str[level] << file <<" line: " << line << " ";
     }
-    log_stream_ << "[" << std::this_thread::get_id() << "] ";
+    log_stream_ << "thread[" << std::this_thread::get_id() << "] ";
 
     level_ = level;
 }
