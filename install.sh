@@ -3,7 +3,7 @@
 #SERVER_NAME=''
 #SERVER_CERT="/etc/overplus/$SERVER_NAME.crt"
 #SERVER_KEY="/etc/overplus/$SERVER_NAME.crt"
-VERSION="v1.0.3"
+VERSION="v1.0.4"
 blue(){
     echo -e "\033[34m\033[01m$1\033[0m"
 }
