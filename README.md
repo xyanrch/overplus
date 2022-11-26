@@ -90,5 +90,6 @@ Trojan protocol is a socks5 like protocol.Trojan request is formed as follows:
 
 ## Roadmap
 - [x] Support UDP proxy for trojan protocol
+- [x] Support websocket for trojan protocol
 - [ ] Implement a web console to manage overplus
 - [ ] Design a new protocol to replace trojan protocol
