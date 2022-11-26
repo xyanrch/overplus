@@ -75,7 +75,7 @@ protected:
     static constexpr size_t MAX_BUFF_SIZE = 8192;
     // SSLSocket ssl_socket;
     boost::asio::io_context& io_context_;
-    T upstream_ssl_socket;
+    T upstream_socket;
 
     tcp::socket downstream_socket;
     //

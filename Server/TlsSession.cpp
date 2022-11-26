@@ -15,23 +15,23 @@
 // |           <-----<----+
 // +-----------+
 //                <--- downstream <---
-#include "ServerSession.h"
+#include "TlsSession.h"
 
-std::atomic<uint32_t> ServerSession::connection_num(0);
-ServerSession::ServerSession(boost::asio::io_context& ioctx, boost::asio::ssl::context& sslctx)
+std::atomic<uint32_t> TlsSession::connection_num(0);
+TlsSession::TlsSession(boost::asio::io_context& ioctx, boost::asio::ssl::context& sslctx)
     : Session<SSLSocket>(ioctx, sslctx, Session::TCP)
 {
     connection_num++;
 }
-ServerSession::~ServerSession()
+TlsSession::~TlsSession()
 {
     connection_num--;
     NOTICE_LOG << "Session destructed, current alive session:" << connection_num.load();
 }
-void ServerSession::start()
+void TlsSession::start()
 {
     auto self = shared_from_this();
-    upstream_ssl_socket.async_handshake(boost::asio::ssl::stream_base::server, [this, self](const boost::system::error_code& error) {
+    upstream_socket.async_handshake(boost::asio::ssl::stream_base::server, [this, self](const boost::system::error_code& error) {
         if (error) {
             ERROR_LOG << "SSL handshake failed: " << error.message();
             destroy();
@@ -41,20 +41,20 @@ void ServerSession::start()
     });
 }
 
-boost::asio::ip::tcp::socket& ServerSession::socket()
+boost::asio::ip::tcp::socket& TlsSession::socket()
 {
-    return upstream_ssl_socket.next_layer();
+    return upstream_socket.next_layer();
 }
 
-void ServerSession::upstream_tcp_write(int direction, size_t len)
+void TlsSession::upstream_tcp_write(int direction, size_t len)
 {
     auto self(this->shared_from_this());
-    upstream_ssl_socket.async_write_some(boost::asio::buffer(out_buf, len), [this, self, direction](boost::system::error_code ec, std::size_t length) {
+    upstream_socket.async_write_some(boost::asio::buffer(out_buf, len), [this, self, direction](boost::system::error_code ec, std::size_t length) {
         if (!ec)
             async_bidirectional_read(direction);
         else {
             if (ec != boost::asio::error::operation_aborted) {
-                ERROR_LOG << " closing session. Remote socket write error", ec.message();
+                ERROR_LOG << " closing session. Remote socket write error"<< ec.message();
             }
             // Most probably remote server closed socket. Let's close both sockets and exit session.
             destroy();
@@ -63,16 +63,16 @@ void ServerSession::upstream_tcp_write(int direction, size_t len)
     });
 }
 
-void ServerSession::upstream_udp_write(int direction, const std::string& packet)
+void TlsSession::upstream_udp_write(int direction, const std::string& packet)
 {
     auto self(this->shared_from_this());
-    upstream_ssl_socket.async_write_some(boost::asio::buffer(packet),
+    upstream_socket.async_write_some(boost::asio::buffer(packet),
         [this, self, direction](boost::system::error_code ec, std::size_t length) {
             if (!ec)
                 udp_async_bidirectional_read(direction);
             else {
                 if (ec != boost::asio::error::operation_aborted) {
-                    ERROR_LOG << " closing session. Remote socket write error", ec.message();
+                    ERROR_LOG << " closing session. Remote socket write error:"<< ec.message();
                 }
                 // Most probably remote server closed socket. Let's close both sockets and exit session.
                 destroy();
@@ -80,17 +80,17 @@ void ServerSession::upstream_udp_write(int direction, const std::string& packet)
             }
         });
 }
-void ServerSession::destroy()
+void TlsSession::destroy()
 {
     if (state_ == DESTROY) {
         return;
     }
     state_ = DESTROY;
     Session<SSLSocket>::destroy();
-    if (upstream_ssl_socket.lowest_layer().is_open()) {
+    if (upstream_socket.lowest_layer().is_open()) {
         boost::system::error_code ec;
-        upstream_ssl_socket.lowest_layer().cancel(ec);
-        upstream_ssl_socket.lowest_layer().shutdown(tcp::socket::shutdown_both, ec);
-        upstream_ssl_socket.lowest_layer().close(ec);
+        upstream_socket.lowest_layer().cancel(ec);
+        upstream_socket.lowest_layer().shutdown(tcp::socket::shutdown_both, ec);
+        upstream_socket.lowest_layer().close(ec);
     }
 }

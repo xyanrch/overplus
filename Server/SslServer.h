@@ -1,5 +1,5 @@
 #pragma once
-#include "ServerSession.h"
+#include "TlsSession.h"
 #include "websocketSession.h"
 #include <Shared/ConfigManage.h>
 #include <Shared/IoContextPool.h>
@@ -32,6 +32,6 @@ private:
     boost::asio::ip::tcp::acceptor acceptor_;
     boost::asio::ssl::context ssl_context_;
 public: 
-    std::shared_ptr<ServerSession> new_connection_;
+    std::shared_ptr<TlsSession> new_connection_;
     std::shared_ptr<WebsocketSession> websocket_connection_;
 };

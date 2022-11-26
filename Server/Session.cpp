@@ -9,7 +9,7 @@ template<class T>
 Session<T>::Session(boost::asio::io_context& ioctx, boost::asio::ssl::context& sslctx, Session::Type type)
 
     : io_context_(ioctx)
-    , upstream_ssl_socket(ioctx, sslctx)
+    , upstream_socket(ioctx, sslctx)
     , downstream_socket(ioctx)
     , resolver_(ioctx)
     , udp_resolver(ioctx)
@@ -24,7 +24,7 @@ template<class T>
 void Session<T>::handle_custom_protocol()
 {
     auto self = this->shared_from_this();
-    upstream_ssl_socket.async_read_some(boost::asio::buffer(in_buf),
+    upstream_socket.async_read_some(boost::asio::buffer(in_buf),
         [this, self](boost::system::error_code ec, std::size_t length) {
             if (ec) {
                 NOTICE_LOG << " Read trojan message failed:" << ec.message();
@@ -69,7 +69,7 @@ template<class T>
 void Session<T>::udp_upstream_read()
 {
     auto self = this->shared_from_this();
-    upstream_ssl_socket.async_read_some(boost::asio::buffer(in_buf),
+    upstream_socket.async_read_some(boost::asio::buffer(in_buf),
         [this, self](boost::system::error_code ec, std::size_t length) {
             if (!ec) {
                 upstream_udp_buff += std::string(in_buf.data(), length);
@@ -145,7 +145,7 @@ void Session<T>::udp_async_bidirectional_read(int direction)
     auto self = this->shared_from_this();
     // We must divide reads by direction to not permit second read call on the same socket.
     if (direction & 0x01)
-        upstream_ssl_socket.async_read_some(boost::asio::buffer(in_buf),
+        upstream_socket.async_read_some(boost::asio::buffer(in_buf),
             [this, self](boost::system::error_code ec, std::size_t length) {
                 if (!ec) {
                     DEBUG_LOG << "--> " << std::to_string(length) << " bytes";
@@ -302,7 +302,7 @@ void Session<T>::async_bidirectional_read(int direction)
     auto self = this->shared_from_this();
     // We must divide reads by direction to not permit second read call on the same socket.
     if (direction & 0x01)
-        upstream_ssl_socket.async_read_some(boost::asio::buffer(in_buf),
+        upstream_socket.async_read_some(boost::asio::buffer(in_buf),
             [this, self](boost::system::error_code ec, std::size_t length) {
                 if (!ec) {
                     DEBUG_LOG << "--> " << std::to_string(length) << " bytes";

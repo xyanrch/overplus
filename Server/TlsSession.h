@@ -2,12 +2,12 @@
 
 #include"Session.h"
 
-class ServerSession :public Session<SSLSocket> {
+class TlsSession :public Session<SSLSocket> {
 
 public:
-    ServerSession(boost::asio::io_context&, boost::asio::ssl::context&);
+    TlsSession(boost::asio::io_context&, boost::asio::ssl::context&);
 
-    ~ServerSession();
+    ~TlsSession();
 
     void start();
 

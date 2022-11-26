@@ -1,7 +1,7 @@
 message(STATUS "Enter Server CMakeList ...")
 
 set(SRCS
-        ServerSession.cpp
+        TlsSession.cpp
         websocketSession.cpp
         SslServer.cpp
         )

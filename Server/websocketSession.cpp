@@ -2,19 +2,19 @@
 #include "Shared/ConfigManage.h"
 #include "Shared/Log.h"
 std::atomic<uint32_t> WebsocketSession::connection_num(0);
-WebsocketSession::WebsocketSession(boost::asio::io_context& ctx, boost::asio::ssl::context& context)
-: Session<websocket::stream<beast::ssl_stream<beast::tcp_stream>>>(ctx,context,Session::WEBSOCKET)
+WebsocketSession::WebsocketSession(boost::asio::io_context& io_ctx, boost::asio::ssl::context& ssl_ctx)
+: Session<websocket::stream<beast::ssl_stream<beast::tcp_stream>>>(io_ctx,ssl_ctx,Session::WEBSOCKET)
 {
     connection_num++;
 }
 void WebsocketSession::start()
 {
     // Set the timeout.
-    beast::get_lowest_layer(upstream_ssl_socket).expires_after(std::chrono::seconds(30));
+    beast::get_lowest_layer(upstream_socket).expires_after(std::chrono::seconds(30));
 
     // Perform the SSL handshake
     auto self = shared_from_this();
-    upstream_ssl_socket.next_layer().async_handshake(
+    upstream_socket.next_layer().async_handshake(
         ssl::stream_base::server,
         [this,self](beast::error_code ec){
             on_handshake(ec);
@@ -28,15 +28,15 @@ void WebsocketSession::on_handshake(beast::error_code ec)
     }
     // Turn off the timeout on the tcp_stream, because
     // the websocket stream has its own timeout system.
-    beast::get_lowest_layer(upstream_ssl_socket).expires_never();
+    beast::get_lowest_layer(upstream_socket).expires_never();
 
     // Set suggested timeout settings for the websocket
-    upstream_ssl_socket.set_option(
+    upstream_socket.set_option(
         websocket::stream_base::timeout::suggested(
             beast::role_type::server));
 
     // Set a decorator to change the Server of the handshake
-    upstream_ssl_socket.set_option(websocket::stream_base::decorator(
+    upstream_socket.set_option(websocket::stream_base::decorator(
         [](websocket::response_type& res) {
             res.set(http::field::server,
                 std::string(BOOST_BEAST_VERSION_STRING) + " websocket-server-async-ssl");
@@ -44,7 +44,7 @@ void WebsocketSession::on_handshake(beast::error_code ec)
 
     // Accept the websocket handshake
     auto self = shared_from_this();
-    upstream_ssl_socket.async_accept(
+    upstream_socket.async_accept(
         [this,self](beast::error_code ec){
             on_accept(ec);
         }
@@ -61,14 +61,13 @@ void WebsocketSession::on_accept(beast::error_code ec)
 void WebsocketSession::upstream_tcp_write(int direction, size_t len)
 {
     auto self(this->shared_from_this());
-    upstream_ssl_socket.async_write(boost::asio::buffer(out_buf, len), [this, self, direction](boost::system::error_code ec, std::size_t length) {
+    upstream_socket.async_write(boost::asio::buffer(out_buf, len), [this, self, direction](boost::system::error_code ec, std::size_t length) {
         if (!ec)
             async_bidirectional_read(direction);
         else {
             if (ec != boost::asio::error::operation_aborted) {
-                ERROR_LOG << " closing session. Remote socket write error", ec.message();
+                NOTICE_LOG << "upstream socket TCP write:" <<ec.message();
             }
-            // Most probably remote server closed socket. Let's close both sockets and exit session.
             destroy();
             return;
         }
@@ -78,15 +77,14 @@ void WebsocketSession::upstream_tcp_write(int direction, size_t len)
 void WebsocketSession::upstream_udp_write(int direction, const std::string& packet)
 {
     auto self(this->shared_from_this());
-    upstream_ssl_socket.async_write(boost::asio::buffer(packet),
+    upstream_socket.async_write(boost::asio::buffer(packet),
         [this, self, direction](boost::system::error_code ec, std::size_t length) {
             if (!ec)
                 udp_async_bidirectional_read(direction);
             else {
                 if (ec != boost::asio::error::operation_aborted) {
-                    ERROR_LOG << " closing session. Remote socket write error", ec.message();
+                    NOTICE_LOG << "upstream socket udp write:" << ec.message();
                 }
-                // Most probably remote server closed socket. Let's close both sockets and exit session.
                 destroy();
                 return;
             }
@@ -99,6 +97,5 @@ void WebsocketSession::destroy()
     }
     state_ = DESTROY;
     Session<websocket::stream<beast::ssl_stream<beast::tcp_stream>>>::destroy();
-
 
 }

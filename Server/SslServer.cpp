@@ -1,5 +1,5 @@
 #include "SslServer.h"
-#include "Server/ServerSession.h"
+#include "Server/TlsSession.h"
 #include "Shared/Log.h"
 #include <boost/asio/io_context.hpp>
 #include <boost/system/error_code.hpp>
@@ -71,7 +71,7 @@ void SslServer::load_server_certificate(boost::asio::ssl::context &ctx) {
 
 
 void SslServer::do_accept() {
-    new_connection_.reset(new ServerSession(context_pool.get_io_context(), ssl_context_));
+    new_connection_.reset(new TlsSession(context_pool.get_io_context(), ssl_context_));
     acceptor_.async_accept(new_connection_->socket(), [this](const boost::system::error_code &ec) {
         auto clean_up = [this]() {
             if (new_connection_->socket().is_open()) {
@@ -102,7 +102,7 @@ void SslServer::do_accept() {
             }
         } else {
             // dump_current_open_fd();
-            NOTICE_LOG << "Session_num:[" << ServerSession::connection_num.load()
+            NOTICE_LOG << "Session_num:[" << TlsSession::connection_num.load()
                        << "] accept incoming connection fail:" << ec.message() << std::endl;
             clean_up();
         }

@@ -15,7 +15,7 @@ public:
     void on_accept(beast::error_code ec);
     boost::asio::ip::tcp::socket& socket()
     {
-        return beast::get_lowest_layer(upstream_ssl_socket).socket();
+        return beast::get_lowest_layer(upstream_socket).socket();
     }
 
     virtual void upstream_tcp_write(int direction, size_t len);
