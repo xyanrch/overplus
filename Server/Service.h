@@ -12,9 +12,9 @@
 #include <memory>
 using namespace boost::asio;
 
-class SslServer : private boost::noncopyable {
+class Service : private boost::noncopyable {
 public:
-    SslServer();
+    Service();
     void run();
 
 private:

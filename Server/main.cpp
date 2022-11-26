@@ -1,4 +1,4 @@
-#include "Server/SslServer.h"
+#include "Server/Service.h"
 #include "Shared/ConfigManage.h"
 //#include<string.h>
 #include "Shared/Log.h"
@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
         });
     }
     try {
-        SslServer server;
+        Service server;
         server.run();
     } catch (const std::exception& e) {
         ERROR_LOG << "Server got exception,will exit :" << e.what();

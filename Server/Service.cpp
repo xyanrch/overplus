@@ -1,4 +1,4 @@
-#include "SslServer.h"
+#include "Service.h"
 #include "Server/TlsSession.h"
 #include "Shared/Log.h"
 #include <boost/asio/io_context.hpp>
@@ -9,7 +9,7 @@
 #include <memory>
 #include <string>
 
-SslServer::SslServer()
+Service::Service()
         : context_pool(5), io_context(context_pool.get_io_context()), signals(io_context), acceptor_(io_context),
           ssl_context_(boost::asio::ssl::context::sslv23) {
 
@@ -34,7 +34,7 @@ SslServer::SslServer()
     }
 
 }
-void SslServer::do_websocket_accept()
+void Service::do_websocket_accept()
 {
     websocket_connection_.reset(new WebsocketSession(context_pool.get_io_context(), ssl_context_));
     acceptor_.async_accept(websocket_connection_->socket(), [this](const boost::system::error_code &ec) {
@@ -56,7 +56,7 @@ void SslServer::do_websocket_accept()
 
 }
 
-void SslServer::load_server_certificate(boost::asio::ssl::context &ctx) {
+void Service::load_server_certificate(boost::asio::ssl::context &ctx) {
 
     auto &config_manage = ConfigManage::instance();
 
@@ -70,7 +70,7 @@ void SslServer::load_server_certificate(boost::asio::ssl::context &ctx) {
 }
 
 
-void SslServer::do_accept() {
+void Service::do_accept() {
     new_connection_.reset(new TlsSession(context_pool.get_io_context(), ssl_context_));
     acceptor_.async_accept(new_connection_->socket(), [this](const boost::system::error_code &ec) {
         auto clean_up = [this]() {
@@ -111,12 +111,12 @@ void SslServer::do_accept() {
     });
 }
 
-void SslServer::run() {
+void Service::run() {
     NOTICE_LOG << "SslServer start..." << std::endl;
     context_pool.run();
 }
 
-void SslServer::add_signals() {
+void Service::add_signals() {
     signals.add(SIGINT);
     signals.add(SIGTERM);
 #ifdef SIGQUIT
