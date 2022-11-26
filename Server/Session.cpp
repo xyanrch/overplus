@@ -380,7 +380,7 @@ void Session<T>::upstream_udp_write(int direction, const std::string& packet)
 template<class T>
 void Session<T>::destroy()
 {
-    DEBUGE_LOG<<"Session destroyed called";
+    DEBUG_LOG<<"Session destroyed called";
     boost::system::error_code ec;
     if (downstream_udp_socket.is_open()) {
         downstream_udp_socket.cancel(ec);
