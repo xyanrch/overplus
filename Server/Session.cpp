@@ -343,17 +343,17 @@ void Session<T>::async_bidirectional_read(int direction)
 template<class T>
 void Session<T>::async_bidirectional_write(int direction, size_t len)
 {
-    auto self(this->shared_from_this());
+    auto self =this->shared_from_this();
 
     switch (direction) {
     case 1:
-        downstream_socket.async_write_some(boost::asio::buffer(in_buf, len),
+        boost::asio::async_write(downstream_socket,boost::asio::buffer(in_buf, len),
             [this, self, direction](boost::system::error_code ec, std::size_t length) {
                 if (!ec)
                     async_bidirectional_read(direction);
                 else {
                     if (ec != boost::asio::error::operation_aborted) {
-                        ERROR_LOG << " Client-->Server" << ec.message();
+                        ERROR_LOG << "Server-->Webserver:" << ec.message();
                     }
                     // Most probably client closed socket. Let's close both sockets and exit session.
                     destroy();
@@ -380,6 +380,7 @@ void Session<T>::upstream_udp_write(int direction, const std::string& packet)
 template<class T>
 void Session<T>::destroy()
 {
+    DEBUGE_LOG<<"Session destroyed called";
     boost::system::error_code ec;
     if (downstream_udp_socket.is_open()) {
         downstream_udp_socket.cancel(ec);

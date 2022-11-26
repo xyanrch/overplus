@@ -45,7 +45,7 @@ boost::asio::ip::tcp::socket& TlsSession::socket()
 void TlsSession::upstream_tcp_write(int direction, size_t len)
 {
     auto self(this->shared_from_this());
-    upstream_socket.async_write_some(boost::asio::buffer(out_buf, len), [this, self, direction](boost::system::error_code ec, std::size_t length) {
+    boost::asio::async_write(upstream_socket,boost::asio::buffer(out_buf, len), [this, self, direction](boost::system::error_code ec, std::size_t length) {
         if (!ec)
             async_bidirectional_read(direction);
         else {
@@ -62,7 +62,7 @@ void TlsSession::upstream_tcp_write(int direction, size_t len)
 void TlsSession::upstream_udp_write(int direction, const std::string& packet)
 {
     auto self(this->shared_from_this());
-    upstream_socket.async_write_some(boost::asio::buffer(packet),
+    boost::asio::async_write(upstream_socket,boost::asio::buffer(packet),
         [this, self, direction](boost::system::error_code ec, std::size_t length) {
             if (!ec)
                 udp_async_bidirectional_read(direction);
@@ -81,6 +81,7 @@ void TlsSession::destroy()
     if (state_ == DESTROY) {
         return;
     }
+    DEBUG_LOG<<"TLS Session destroyed called";
     state_ = DESTROY;
     Session<SSLSocket>::destroy();
     if (upstream_socket.lowest_layer().is_open()) {
@@ -89,4 +90,6 @@ void TlsSession::destroy()
         upstream_socket.lowest_layer().shutdown(tcp::socket::shutdown_both, ec);
         upstream_socket.lowest_layer().close(ec);
     }
+
+
 }
