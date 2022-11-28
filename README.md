@@ -22,6 +22,9 @@ curl -O https://raw.githubusercontent.com/xyanrch/overplus/master/install.sh && 
  **It is strongly recommended to enable BBR to accelerate the network speed.**
  
 **[Enable BBR on 20.04 and CentOS 8](https://cloud.tencent.com/developer/article/1946062)**
+## Client side
+A windows client that support v protocol can find in release page. Overplus fully support trojan protocol, so you can use any client which support trojan protocol. Please make sure disable certificate verification if you use a self issued certificate.
+
 
 ## Build
 The project depend on boost and openssl libraries, please make sure install boost and openssl before build the project.
@@ -54,7 +57,8 @@ server.json is a config file which you can customize.
     "ssl": {
         "cert": "path_to_cert",
         "key": "path_to_key"
-    }
+    },
+  "websocketEnabled": false
 }
 ```
 ## Windows platform build
@@ -84,12 +88,13 @@ Trojan protocol is a socks5 like protocol.Trojan request is formed as follows:
         +----+-----+-------+------+----------+----------+-------+
 ![flow chart](asset/flow.png)
 
- ## Client side 
- A windows client that support v protocol can find in release page. Overplus fully support trojan protocol, So it is Ok to use trojan's client. Please make sure disable certificate verification if you use a self issued certificate.
-
-
 ## Roadmap
 - [x] Support UDP proxy for trojan protocol
 - [x] Support websocket for trojan protocol
 - [ ] Implement a web console to manage overplus
 - [ ] Design a new protocol to replace trojan protocol
+
+## Stargazers over time
+
+[![Stargazers over time](https://starchart.cc/xyanrch/overplus.svg)](https://starchart.cc/xyanrch/overplus)
+
