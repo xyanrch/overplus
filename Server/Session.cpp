@@ -6,7 +6,7 @@
 #include <cstring>
 #include <string>
 template<class T>
-Session<T>::Session(boost::asio::io_context& ioctx, boost::asio::ssl::context& sslctx, Session::Type type)
+Session<T>::Session(boost::asio::io_context& ioctx, boost::asio::ssl::context& sslctx)
 
     : io_context_(ioctx)
     , upstream_socket(ioctx, sslctx)
@@ -16,7 +16,6 @@ Session<T>::Session(boost::asio::io_context& ioctx, boost::asio::ssl::context& s
     , downstream_udp_socket(ioctx)
     , in_buf(MAX_BUFF_SIZE)
     , out_buf(MAX_BUFF_SIZE)
-    , session_type(type)
 
 {
 }

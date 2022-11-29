@@ -43,12 +43,8 @@ public:
         FORWARD,
         DESTROY
     };
-    enum Type{
-        WEBSOCKET,
-        TCP
-    };
 public:
-    Session(boost::asio::io_context&, boost::asio::ssl::context&,Session::Type type);
+    Session(boost::asio::io_context&, boost::asio::ssl::context&);
 
     virtual ~Session(){}
 
@@ -93,7 +89,6 @@ protected:
     std::string remote_host;
     std::string remote_port;
     bool vprotocol = false;
-    Type session_type;
 
 };
 #include "Session.cpp"

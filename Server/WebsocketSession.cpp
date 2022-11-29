@@ -2,7 +2,7 @@
 #include "Shared/ConfigManage.h"
 #include "Shared/Log.h"
 WebsocketSession::WebsocketSession(boost::asio::io_context& io_ctx, boost::asio::ssl::context& ssl_ctx)
-: Session<websocket::stream<beast::ssl_stream<beast::tcp_stream>>>(io_ctx,ssl_ctx,Session::WEBSOCKET)
+: Session<websocket::stream<beast::ssl_stream<beast::tcp_stream>>>(io_ctx,ssl_ctx)
 {
 }
 void WebsocketSession::start()

@@ -1,24 +1,8 @@
 
-// The following is a flow and structural diagram depicting the
-// various elements  (proxy, server  and client)  and how  they
-// connect and interact with each other.
-
-//
-//                                    ---> upstream --->           +---------------+
-//                                                     +---->------>               |
-//                               +-----------+         |           | Remote Server |
-//                     +--------->          [x]--->----+  +---<---[x]              |
-//                     |         | TCP Proxy |            |        +---------------+
-// +-----------+       |  +--<--[x] Server   <-----<------+
-// |          [x]--->--+  |      +-----------+
-// |  Client   |          |
-// |           <-----<----+
-// +-----------+
-//                <--- downstream <---
 #include "TlsSession.h"
 
 TlsSession::TlsSession(boost::asio::io_context& ioctx, boost::asio::ssl::context& sslctx)
-    : Session<SSLSocket>(ioctx, sslctx, Session::TCP)
+    : Session<SSLSocket>(ioctx, sslctx)
 {
 }
 TlsSession::~TlsSession()
