@@ -89,7 +89,7 @@ void Service::do_accept() {
             boost::system::error_code error;
             auto ep = new_connection_->socket().remote_endpoint(error);
             if (!error) {
-                DEBUG_LOG << "accept incoming connection :" << ep.address().to_string();
+                DEBUG_LOG << "accept incoming connection "<< ep.address().to_string()<<":"<<ep.port();
                 new_connection_->socket().set_option(boost::asio::socket_base::keep_alive(true));
                 new_connection_->start();
 

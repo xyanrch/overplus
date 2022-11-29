@@ -3,7 +3,7 @@ Description=overplus - An proxy tool helps you bypass GFW
 After=network.target
 [Service]
 User=root
-ExecStart=/usr/bin/overplus  /etc/overplus/server.json
+ExecStart=/usr/bin/overplus -c /etc/overplus/server.json
 Restart=on-failure
 RestartSec=10s
 LimitNOFILE=infinity
