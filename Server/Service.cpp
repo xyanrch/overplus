@@ -40,7 +40,7 @@ void Service::do_websocket_accept()
     acceptor_.async_accept(websocket_connection_->socket(), [this](const boost::system::error_code &ec) {
         if(!ec){
             auto ep = websocket_connection_->socket().remote_endpoint();
-            NOTICE_LOG << "accept incoming connection :" << ep.address().to_string();
+            NOTICE_LOG << "accept incoming connection " << ep.address().to_string()<<":"<<ep.port();
             websocket_connection_->start();
         }
         else

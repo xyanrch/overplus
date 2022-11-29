@@ -15,7 +15,7 @@ int main(int argc, char* argv[])
         po::options_description desc("Allowed options");
         desc.add_options()                        //
             ("version,v", "print version string") //
-            ("help,h", "produce help message")    //
+            ("help,h", "print help message")    //
             ("config,c", po::value<std::string>(&config_file)->default_value("server.json"), "config file path");
         po::variables_map vm;
         po::store(po::parse_command_line(argc, argv, desc), vm);
