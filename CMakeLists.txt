@@ -10,7 +10,7 @@ add_compile_options(-DBOOST_ASIO_CONCURRENCY_HINT_1=BOOST_ASIO_CONCURRENCY_HINT_
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 #set(Boost_USE_STATIC_LIBS on)
 include_directories(.)
-find_package(Boost 1.66  COMPONENTS system  REQUIRED)
+find_package(Boost 1.66  COMPONENTS system program_options  REQUIRED)
 if(Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
     link_directories(${Boost_LIBRARY_DIRS})
