@@ -27,7 +27,6 @@ void Session<T>::handle_custom_protocol()
         [this, self](boost::system::error_code ec, std::size_t length) {
             if (ec) {
                 NOTICE_LOG << " Read trojan message failed:" << ec.message();
-                // Log::log_with_endpoint(in_endpoint, "SSL handshake failed: " + error.message(), Log::ERROR);
                 destroy();
                 return;
             }
@@ -112,7 +111,6 @@ void Session<T>::handle_trojan_udp_proxy()
                 break;
             }
         }
-        // Log::log_with_endpoint(in_endpoint, query_addr + " is resolved to " + iterator->endpoint().address().to_string(), Log::ALL);
         if (!downstream_udp_socket.is_open()) {
             auto protocol = iterator->endpoint().protocol();
             boost::system::error_code ec;
@@ -130,7 +128,6 @@ void Session<T>::handle_trojan_udp_proxy()
                     if (ec != boost::asio::error::operation_aborted) {
                         ERROR_LOG << "Server-->RemoteWeb(udp):" << ec.message();
                     }
-                    // Most probably client closed socket. Let's close both sockets and exit session.
                     destroy();
                     return;
                 }
@@ -187,7 +184,6 @@ void Session<T>::udp_async_bidirectional_read(int direction)
                         ERROR_LOG << "client-->Server(UDP over tls) " << ec.message();
                     }
 
-                    // Most probably client closed socket. Let's close both sockets and exit session.
                     destroy();
                     return;
                 }
@@ -209,7 +205,7 @@ void Session<T>::udp_async_bidirectional_read(int direction)
                         ERROR_LOG << "Server<--RemoteWeb(udp): " << ec.message();
                     }
 
-                    // Most probably remote server closed socket. Let's close both sockets and exit session.
+
                     destroy();
                     return;
                 }
@@ -231,7 +227,7 @@ void Session<T>::udp_async_bidirectional_write(int direction, const std::string&
                     if (ec != boost::asio::error::operation_aborted) {
                         ERROR_LOG << "Server-->RemoteWeb(udp):" << ec.message();
                     }
-                    // Most probably client closed socket. Let's close both sockets and exit session.
+
                     destroy();
                     return;
                 }
@@ -279,7 +275,6 @@ void Session<T>::do_connect(tcp::resolver::iterator& it)
                                 async_bidirectional_read(3);
                             else {
                                 ERROR_LOG << "Client<--Server:" << ec.message();
-                                // Most probably client closed socket. Let's close both sockets and exit session.
                                 destroy();
                                 return;
                             }
@@ -312,8 +307,6 @@ void Session<T>::async_bidirectional_read(int direction)
                     if (ec != boost::asio::error::eof && ec != boost::asio::error::operation_aborted) {
                         ERROR_LOG << "Client-->Server: " << ec.message();
                     }
-
-                    // Most probably client closed socket. Let's close both sockets and exit session.
                     destroy();
                     return;
                 }
@@ -332,8 +325,6 @@ void Session<T>::async_bidirectional_read(int direction)
                     if (ec != boost::asio::error::eof && ec != boost::asio::error::operation_aborted) {
                         ERROR_LOG << "Server<--RemoteWeb: " << ec.message();
                     }
-
-                    // Most probably remote server closed socket. Let's close both sockets and exit session.
                     destroy();
                     return;
                 }
@@ -354,7 +345,6 @@ void Session<T>::async_bidirectional_write(int direction, size_t len)
                     if (ec != boost::asio::error::operation_aborted) {
                         ERROR_LOG << "Server-->Webserver:" << ec.message();
                     }
-                    // Most probably client closed socket. Let's close both sockets and exit session.
                     destroy();
                     return;
                 }
