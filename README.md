@@ -39,7 +39,7 @@ make
 ### How to run
 
 ``` commandline
-sudo ./overplus server.json
+sudo ./overplus -c server.json
 ```
 server.json is a config file which you can customize.
 
