@@ -1,8 +1,8 @@
 message(STATUS "Enter Protocal CMakeList ...")
 set(proto_SRCS
         socks5/socks5.cpp
-        TrojanReq.cpp
-        UDPPacket.cpp
+        trojan/TrojanReq.cpp
+        trojan/UDPPacket.cpp
         VProtocal/VRequest.cpp
         )
 
